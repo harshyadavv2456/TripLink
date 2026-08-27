@@ -1,0 +1,6 @@
+{
+  "name": "TripLink",
+  "description": "Multi-trip itinerary hub linking past, present, and future journeys with cross-trip budget tracking, memory-aware Gemini AI itinerary generation, reusable packing templates, and connected travel journals.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
