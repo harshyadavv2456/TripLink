@@ -115,9 +115,9 @@ interface TripContextType {
 
 const TripContext = createContext<TripContextType | undefined>(undefined);
 
-const STORAGE_KEY_TRIPS = 'triplink_trips_v1';
-const STORAGE_KEY_USER = 'triplink_user_v1';
-const STORAGE_KEY_TEMPLATES = 'triplink_templates_v1';
+const STORAGE_KEY_TRIPS = 'triplink_trips_clean_v1';
+const STORAGE_KEY_USER = 'triplink_user_clean_v1';
+const STORAGE_KEY_TEMPLATES = 'triplink_templates_clean_v1';
 
 export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [trips, setTrips] = useState<Trip[]>(() => {
@@ -188,21 +188,16 @@ export const TripProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const res = await fetch('/api/data');
         if (res.ok) {
           const json = await res.json();
-          if (json.data && json.data.trips && json.data.trips.length > 0) {
-            setTrips(json.data.trips);
-            if (json.data.user) setUser(json.data.user);
-            if (json.data.packingTemplates) setPackingTemplates(json.data.packingTemplates);
-          } else {
-            // First time seeding server
-            await fetch('/api/data', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                trips: INITIAL_TRIPS,
-                user: INITIAL_USER,
-                packingTemplates: INITIAL_PACKING_TEMPLATES,
-              }),
-            });
+          if (json.data) {
+            if (Array.isArray(json.data.trips)) {
+              setTrips(json.data.trips);
+            }
+            if (json.data.user && json.data.user.name) {
+              setUser((prev) => ({ ...prev, ...json.data.user }));
+            }
+            if (Array.isArray(json.data.packingTemplates)) {
+              setPackingTemplates(json.data.packingTemplates);
+            }
           }
         }
       } catch (e) {

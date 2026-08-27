@@ -84,7 +84,7 @@ const DISCOVERY_POOLS: Record<string, CuratedDiscoverySpot[]> = {
       location: 'Setagaya, Tokyo',
       image: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=800&q=80',
       rating: 4.7,
-      reason: 'Relaxed hipster quarter loved by Tokyo designers.',
+      reason: 'Relaxed quarter loved by Tokyo creators.',
     },
     {
       id: 'disc-5',
@@ -148,11 +148,11 @@ export const VibeDiscoverySwipe: React.FC<VibeDiscoverySwipeProps> = ({ trip }) 
 
   // Find discovery pool for this trip's destination
   const pool = useMemo(() => {
-    const cityKey = (trip.destinations[0]?.city || 'general').toLowerCase().replace(/\s+/g, '');
+    const cityKey = (trip.destinations?.[0]?.city || 'general').toLowerCase().replace(/\s+/g, '');
     const found = DISCOVERY_POOLS[cityKey] || DISCOVERY_POOLS.general;
 
     // Filter out places already visited in user's profile
-    const visitedNames = user.visitedPlaces.map((vp) => vp.name.toLowerCase());
+    const visitedNames = (user.visitedPlaces || []).map((vp) => vp.name.toLowerCase());
     return found.filter((spot) => !visitedNames.includes(spot.name.toLowerCase()));
   }, [trip, user]);
 
@@ -164,13 +164,11 @@ export const VibeDiscoverySwipe: React.FC<VibeDiscoverySwipeProps> = ({ trip }) 
     setSwipeDirection(direction);
 
     if (direction === 'right') {
-      // Approved!
       try {
         confetti({ particleCount: 40, spread: 50, origin: { y: 0.7 } });
       } catch (e) {}
 
-      // Find day id
-      const targetDay = trip.days.find((d) => d.dayNumber === selectedDayNumber) || trip.days[0];
+      const targetDay = (trip.days || []).find((d) => d.dayNumber === selectedDayNumber) || trip.days?.[0];
       if (targetDay) {
         addActivity(trip.id, targetDay.id, {
           name: currentSpot.name,
@@ -202,27 +200,27 @@ export const VibeDiscoverySwipe: React.FC<VibeDiscoverySwipeProps> = ({ trip }) 
     <div className="max-w-2xl mx-auto space-y-6 animate-in fade-in duration-300">
       
       {/* Header */}
-      <div className="bg-white rounded-2xl p-6 border border-[#E5E1DA] shadow-xs text-center space-y-2">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-[#8C8881]">
+      <div className="luxury-card rounded-3xl p-6 sm:p-8 border-white/[0.08] shadow-2xl text-center space-y-3">
+        <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#E5C578]">
           Gesture-Based Curation
         </span>
-        <h2 className="font-serif text-2xl sm:text-3xl font-light text-[#1A1A1A] flex items-center justify-center gap-2">
-          <Sparkles className="w-5 h-5 text-amber-500" />
+        <h2 className="font-serif text-2xl sm:text-3xl font-light text-white flex items-center justify-center gap-2">
+          <Sparkles className="w-5 h-5 text-[#E5C578]" />
           Vibe Discovery Deck
         </h2>
-        <p className="text-xs text-[#8C8881] max-w-md mx-auto">
-          Swipe right to approve and add directly into your itinerary; swipe left to skip. Zero repetitive typing needed!
+        <p className="text-xs text-stone-400 max-w-md mx-auto">
+          Swipe right or tap heart to approve and add directly into your itinerary; swipe left to skip. Zero typing needed!
         </p>
 
         {/* Day Target Selector */}
-        <div className="pt-3 flex items-center justify-center gap-2">
-          <span className="text-xs font-semibold text-[#8C8881]">Add approved spots into:</span>
+        <div className="pt-2 flex items-center justify-center gap-2">
+          <span className="text-xs text-stone-400 font-mono">Add approved spots to:</span>
           <select
             value={selectedDayNumber}
             onChange={(e) => setSelectedDayNumber(Number(e.target.value))}
-            className="px-3 py-1.5 rounded-xl border border-[#E5E1DA] text-xs font-semibold bg-[#FDFCFB] text-[#1A1A1A] focus:outline-none"
+            className="px-3.5 py-1.5 rounded-xl border border-white/10 text-xs font-mono font-semibold bg-[#0D0F15] text-white focus:outline-none focus:border-[#E5C578]"
           >
-            {trip.days.map((d) => (
+            {(trip.days || []).map((d) => (
               <option key={d.id} value={d.dayNumber}>
                 Day {d.dayNumber}: {d.destination}
               </option>
@@ -235,7 +233,7 @@ export const VibeDiscoverySwipe: React.FC<VibeDiscoverySwipeProps> = ({ trip }) 
       <div className="relative min-h-[460px] flex items-center justify-center">
         {currentSpot ? (
           <div
-            className={`w-full bg-white rounded-3xl border border-[#E5E1DA] shadow-md overflow-hidden transition-all duration-300 select-none ${
+            className={`w-full luxury-card-elevated rounded-3xl border-white/20 shadow-2xl overflow-hidden transition-all duration-300 select-none ${
               swipeDirection === 'right'
                 ? 'translate-x-32 rotate-6 opacity-0'
                 : swipeDirection === 'left'
@@ -244,20 +242,20 @@ export const VibeDiscoverySwipe: React.FC<VibeDiscoverySwipeProps> = ({ trip }) 
             }`}
           >
             {/* Spot Hero Image */}
-            <div className="relative h-64 sm:h-72 w-full overflow-hidden bg-stone-100">
+            <div className="relative h-64 sm:h-72 w-full overflow-hidden bg-stone-900">
               <img
                 src={currentSpot.image}
                 alt={currentSpot.name}
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#090A0E] via-[#090A0E]/30 to-transparent" />
 
               {/* Badges */}
               <div className="absolute top-4 left-4 flex items-center gap-2">
-                <span className="px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-white font-mono text-[10px] font-bold uppercase tracking-wider">
+                <span className="px-3 py-1 rounded-full bg-black/70 backdrop-blur-md text-[#E5C578] font-mono text-[10px] font-bold uppercase tracking-wider border border-white/10">
                   {currentSpot.category}
                 </span>
-                <span className="px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md text-[#1A1A1A] text-[10px] font-bold">
+                <span className="px-3 py-1 rounded-full bg-white/90 backdrop-blur-md text-black text-[10px] font-bold">
                   ★ {currentSpot.rating}
                 </span>
               </div>
@@ -266,8 +264,8 @@ export const VibeDiscoverySwipe: React.FC<VibeDiscoverySwipeProps> = ({ trip }) 
                 <h3 className="font-serif text-xl sm:text-2xl font-medium leading-tight">
                   {currentSpot.name}
                 </h3>
-                <p className="text-xs text-stone-200 flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-stone-300" />
+                <p className="text-xs text-stone-300 flex items-center gap-1.5 font-mono">
+                  <MapPin className="w-3.5 h-3.5 text-[#E5C578]" />
                   {currentSpot.location}
                 </p>
               </div>
@@ -275,39 +273,39 @@ export const VibeDiscoverySwipe: React.FC<VibeDiscoverySwipeProps> = ({ trip }) 
 
             {/* Details Body */}
             <div className="p-6 space-y-4">
-              <p className="text-xs sm:text-sm text-[#1A1A1A] leading-relaxed">
+              <p className="text-xs sm:text-sm text-stone-300 leading-relaxed font-light">
                 {currentSpot.tagline}
               </p>
 
-              <div className="p-3 rounded-xl bg-[#FDFCFB] border border-[#E5E1DA] text-xs text-[#8C8881] space-y-1">
+              <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/[0.08] text-xs text-stone-400 space-y-1.5">
                 <div className="flex items-center justify-between font-medium">
-                  <span>Best Timing: <strong className="text-[#1A1A1A] capitalize">{currentSpot.timeBlock}</strong></span>
-                  <span className="font-mono font-bold text-[#1A1A1A]">
+                  <span>Best Timing: <strong className="text-white capitalize font-mono">{currentSpot.timeBlock}</strong></span>
+                  <span className="font-mono font-bold text-[#E5C578]">
                     {currentSpot.estCost > 0 ? formatCurrency(currentSpot.estCost, baseCurrency) : 'Free Admission'}
                   </span>
                 </div>
-                <p className="text-[11px] text-[#8C8881]">
-                  💡 {currentSpot.reason}
+                <p className="text-[11px] text-stone-400 font-light">
+                  ✨ {currentSpot.reason}
                 </p>
               </div>
 
               {/* Action Buttons */}
-              <div className="pt-2 flex items-center justify-center gap-4">
+              <div className="pt-2 flex items-center justify-center gap-5">
                 <button
                   onClick={() => handleSwipe('left')}
-                  className="w-14 h-14 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-xs cursor-pointer"
+                  className="w-14 h-14 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-lg cursor-pointer"
                   title="Pass / Skip (Swipe Left)"
                 >
                   <X className="w-6 h-6" />
                 </button>
 
-                <div className="text-[11px] font-mono text-[#8C8881] uppercase tracking-wider">
+                <div className="text-[11px] font-mono text-stone-500 uppercase tracking-widest">
                   Card {currentIndex + 1} of {pool.length}
                 </div>
 
                 <button
                   onClick={() => handleSwipe('right')}
-                  className="w-14 h-14 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-xs cursor-pointer"
+                  className="w-14 h-14 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-lg cursor-pointer"
                   title="Add to Itinerary (Swipe Right)"
                 >
                   <Heart className="w-6 h-6 fill-current" />
@@ -318,16 +316,16 @@ export const VibeDiscoverySwipe: React.FC<VibeDiscoverySwipeProps> = ({ trip }) 
           </div>
         ) : (
           /* Empty / Finished Deck */
-          <div className="w-full p-8 rounded-3xl bg-white border border-[#E5E1DA] shadow-xs text-center space-y-4">
-            <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center mx-auto">
+          <div className="w-full p-10 rounded-3xl luxury-card border-white/[0.08] shadow-2xl text-center space-y-4">
+            <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto">
               <CheckCircle2 className="w-7 h-7" />
             </div>
 
             <div className="space-y-1">
-              <h3 className="font-serif text-xl font-medium text-[#1A1A1A]">
+              <h3 className="font-serif text-xl font-light text-white">
                 You've Curated All Current Vibe Spots!
               </h3>
-              <p className="text-xs text-[#8C8881] max-w-sm mx-auto">
+              <p className="text-xs text-stone-400 max-w-sm mx-auto">
                 {approvedList.length} spots approved and seamlessly integrated into your itinerary.
               </p>
             </div>
@@ -335,7 +333,7 @@ export const VibeDiscoverySwipe: React.FC<VibeDiscoverySwipeProps> = ({ trip }) 
             <div className="flex justify-center gap-3 pt-2">
               <button
                 onClick={handleReset}
-                className="px-4 py-2 rounded-xl bg-white border border-[#E5E1DA] text-xs font-semibold text-[#1A1A1A] hover:bg-stone-50 flex items-center gap-1.5 cursor-pointer shadow-xs"
+                className="px-5 py-2.5 rounded-xl bg-white text-black text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-lg hover:bg-stone-200"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Replay Deck</span>
@@ -347,17 +345,17 @@ export const VibeDiscoverySwipe: React.FC<VibeDiscoverySwipeProps> = ({ trip }) 
 
       {/* Approved list preview */}
       {approvedList.length > 0 && (
-        <div className="p-4 rounded-2xl bg-white border border-[#E5E1DA] shadow-xs space-y-2">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-[#8C8881] block">
+        <div className="p-5 rounded-3xl luxury-card border-white/[0.08] shadow-xl space-y-2.5">
+          <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#E5C578] block">
             Approved & Added in this session ({approvedList.length})
           </span>
           <div className="flex flex-wrap gap-2">
             {approvedList.map((spot) => (
               <span
                 key={spot.id}
-                className="px-2.5 py-1 rounded-lg bg-[#FDFCFB] border border-[#E5E1DA] text-xs font-medium text-[#1A1A1A] flex items-center gap-1.5"
+                className="px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-xs font-medium text-white flex items-center gap-1.5 font-mono"
               >
-                <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                 {spot.name}
               </span>
             ))}

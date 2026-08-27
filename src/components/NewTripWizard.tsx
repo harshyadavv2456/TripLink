@@ -18,6 +18,8 @@ import {
   Zap,
   Globe,
   SlidersHorizontal,
+  DollarSign,
+  Users,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -221,89 +223,91 @@ export const NewTripWizard: React.FC = () => {
       
       {/* Wizard Header */}
       <div className="text-center space-y-2">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-[#8C8881]">
-          Connected AI Planner
+        <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#E5C578]">
+          Connected AI Architect
         </span>
-        <h1 className="font-serif text-3xl sm:text-4xl font-light text-[#1A1A1A]">
-          Create a New Journey
+        <h1 className="font-serif text-3xl sm:text-4xl font-light text-white">
+          Architect a New Journey
         </h1>
-        <p className="text-xs sm:text-sm text-[#8C8881] max-w-lg mx-auto">
-          TripLink cross-references your memory bank ({user.visitedPlaces.length} visited places) so you never get recommended places you've already seen.
+        <p className="text-xs sm:text-sm text-stone-400 max-w-lg mx-auto leading-relaxed">
+          TripLink cross-references your memory bank ({(user.visitedPlaces || []).length} recorded stops) so you never receive duplicate recommendations.
         </p>
       </div>
 
       {/* Mode Switcher Pills */}
       <div className="flex items-center justify-center">
-        <div className="flex items-center gap-1 bg-[#FDFCFB] p-1.5 rounded-2xl border border-[#E5E1DA] shadow-xs">
+        <div className="flex items-center gap-1 bg-[#12151E] p-1.5 rounded-2xl border border-white/[0.08] shadow-lg shadow-black/40">
           <button
             onClick={() => setCreationMode('prompt')}
             className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer ${
               creationMode === 'prompt'
-                ? 'bg-[#1A1A1A] text-white shadow-xs'
-                : 'text-[#8C8881] hover:text-[#1A1A1A]'
+                ? 'bg-white/10 text-white shadow-sm'
+                : 'text-stone-400 hover:text-white'
             }`}
           >
-            <Sparkles className="w-4 h-4 text-amber-400" />
+            <Sparkles className="w-4 h-4 text-[#E5C578]" />
             <span>Prompt to Journey</span>
-            <span className="text-[9px] font-mono bg-white/20 px-1.5 py-0.2 rounded-full uppercase">Instant</span>
+            <span className="text-[9px] font-mono bg-[#E5C578]/20 text-[#E5C578] px-1.5 py-0.2 rounded-full uppercase">Instant</span>
           </button>
 
           <button
             onClick={() => setCreationMode('dropdown')}
             className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer ${
               creationMode === 'dropdown'
-                ? 'bg-[#1A1A1A] text-white shadow-xs'
-                : 'text-[#8C8881] hover:text-[#1A1A1A]'
+                ? 'bg-white/10 text-white shadow-sm'
+                : 'text-stone-400 hover:text-white'
             }`}
           >
-            <Zap className="w-4 h-4 text-blue-500" />
-            <span>Quick Dropdowns</span>
+            <Zap className="w-4 h-4 text-sky-400" />
+            <span>Quick Selectors</span>
           </button>
 
           <button
             onClick={() => setCreationMode('manual')}
             className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer ${
               creationMode === 'manual'
-                ? 'bg-[#1A1A1A] text-white shadow-xs'
-                : 'text-[#8C8881] hover:text-[#1A1A1A]'
+                ? 'bg-white/10 text-white shadow-sm'
+                : 'text-stone-400 hover:text-white'
             }`}
           >
-            <SlidersHorizontal className="w-4 h-4" />
-            <span>Custom Wizard</span>
+            <SlidersHorizontal className="w-4 h-4 text-stone-400" />
+            <span>Custom Architect</span>
           </button>
         </div>
       </div>
 
       {/* Main Card */}
-      <div className="bg-white rounded-2xl p-6 sm:p-8 border border-[#E5E1DA] shadow-xs space-y-6 relative overflow-hidden">
+      <div className="luxury-card-elevated rounded-3xl p-6 sm:p-8 border-white/[0.1] shadow-2xl space-y-6 relative overflow-hidden">
         
         {/* Loading Overlay */}
         {isLoading && (
-          <div className="absolute inset-0 bg-[#1A1A1A]/95 backdrop-blur-xs z-30 flex flex-col items-center justify-center p-6 text-center text-white space-y-6 animate-fade-in">
-            <div className="w-14 h-14 rounded-2xl border border-white/20 flex items-center justify-center">
-              <Compass className="w-7 h-7 text-white animate-spin" style={{ animationDuration: '4s' }} />
+          <div className="absolute inset-0 bg-[#090A0E]/95 backdrop-blur-md z-30 flex flex-col items-center justify-center p-6 text-center text-white space-y-6 animate-fade-in">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#D4AF37] to-[#8C6B1B] p-[1px] shadow-xl shadow-[#D4AF37]/20 flex items-center justify-center">
+              <div className="w-full h-full bg-[#0E1017] rounded-[15px] flex items-center justify-center">
+                <Compass className="w-8 h-8 text-[#E5C578] animate-spin" style={{ animationDuration: '4s' }} />
+              </div>
             </div>
 
-            <div className="space-y-1.5 max-w-md">
+            <div className="space-y-2 max-w-md">
               <h3 className="font-serif text-2xl font-light text-white">
-                Generating Connected Journey
+                Generating Connected Expedition
               </h3>
-              <p className="text-xs text-stone-300 leading-relaxed font-light">
-                {aiLoadingMessage || 'Gemini 3.7 Flash cross-referencing your visited places catalog and structuring schedule...'}
+              <p className="text-xs text-stone-400 leading-relaxed font-light">
+                {aiLoadingMessage || 'Gemini 3.7 Flash cross-referencing your visited places catalog and synthesizing coordinate sequence...'}
               </p>
             </div>
 
-            <div className="w-full max-w-xs space-y-2 text-left text-xs bg-white/10 p-4 rounded-xl border border-white/10">
-              <div className="flex items-center gap-2 text-white">
+            <div className="w-full max-w-xs space-y-2.5 text-left text-xs bg-white/[0.04] p-4 rounded-2xl border border-white/[0.08]">
+              <div className="flex items-center gap-2 text-stone-300">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Base Currency set to {currencyConfig.name} ({currencyConfig.symbol})</span>
+                <span>Base Currency: <strong className="text-white">{currencyConfig.name} ({currencyConfig.symbol})</strong></span>
               </div>
-              <div className="flex items-center gap-2 text-white">
+              <div className="flex items-center gap-2 text-stone-300">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Memory bank checked ({user.visitedPlaces.length} past stops excluded)</span>
+                <span>Memory bank checked ({(user.visitedPlaces || []).length} past stops excluded)</span>
               </div>
-              <div className="flex items-center gap-2 text-stone-300 animate-pulse">
-                <span className="w-1.5 h-1.5 rounded-full bg-white" />
+              <div className="flex items-center gap-2 text-[#E5C578] animate-pulse">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#E5C578]" />
                 <span>Synthesizing day-by-day morning & evening blocks...</span>
               </div>
             </div>
@@ -312,24 +316,22 @@ export const NewTripWizard: React.FC = () => {
 
         {/* Error message */}
         {errorMsg && (
-          <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2.5">
-            <AlertCircle className="w-4 h-4 shrink-0" />
+          <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2.5">
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
             <span>{errorMsg}</span>
           </div>
         )}
 
-        {/* =========================================================================
-            MODE 1: NATURAL PROMPT TO JOURNEY (Zero typing / Instant)
-           ========================================================================= */}
+        {/* MODE 1: PROMPT TO JOURNEY */}
         {creationMode === 'prompt' && (
           <div className="space-y-6">
-            <div className="space-y-1 border-b border-[#E5E1DA] pb-3">
-              <h2 className="font-serif text-xl sm:text-2xl font-light text-[#1A1A1A] flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-amber-500" />
-                Describe Your Dream Travel in Natural Language
+            <div className="space-y-1 border-b border-white/[0.08] pb-3">
+              <h2 className="font-serif text-xl sm:text-2xl font-light text-white flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-[#E5C578]" />
+                Describe Your Travel Vision in Natural Language
               </h2>
-              <p className="text-xs text-[#8C8881]">
-                Type anything you want (destination, vibe, duration, budget, pace). Gemini 3.7 Flash will handle the rest.
+              <p className="text-xs text-stone-400">
+                Type anything you desire (destinations, pace, vibe, budget, style). Gemini 3.7 Flash will construct the full itinerary.
               </p>
             </div>
 
@@ -341,33 +343,33 @@ export const NewTripWizard: React.FC = () => {
                   value={naturalPrompt}
                   onChange={(e) => setNaturalPrompt(e.target.value)}
                   placeholder="e.g. Plan a 7-day culinary and temple exploration in Tokyo and Kyoto for 2 people with a budget around $3,000. Include scenic train rides, ramen spots, and sunset viewpoints..."
-                  className="w-full p-4 rounded-2xl bg-[#FDFCFB] border border-[#E5E1DA] text-xs sm:text-sm text-[#1A1A1A] placeholder:text-[#8C8881] focus:outline-none focus:border-[#1A1A1A] resize-none leading-relaxed"
+                  className="w-full p-4 rounded-2xl bg-[#0D0F15] border border-white/[0.1] text-xs sm:text-sm text-white placeholder:text-stone-400 focus:outline-none focus:border-[#E5C578]/60 resize-none leading-relaxed transition-all"
                 />
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-[11px] text-[#8C8881] font-mono">
-                  Base Currency: <strong>{currencyConfig.code} ({currencyConfig.symbol})</strong>
+                <span className="text-[11px] text-stone-400 font-mono">
+                  Base Currency: <strong className="text-white">{currencyConfig.code} ({currencyConfig.symbol})</strong>
                 </span>
 
                 <button
                   onClick={() => handleGenerateFromPrompt()}
                   disabled={isLoading}
-                  className="py-2.5 px-6 rounded-xl bg-[#1A1A1A] text-white text-xs font-semibold hover:bg-black transition-all flex items-center gap-2 shadow-xs cursor-pointer"
+                  className="py-2.5 px-6 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#E5C578] to-[#C59B27] hover:brightness-110 text-[#090A0E] text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 shadow-lg shadow-[#D4AF37]/20 btn-tactile cursor-pointer"
                 >
-                  <Send className="w-3.5 h-3.5" />
+                  <Send className="w-3.5 h-3.5 text-[#090A0E] stroke-[2.5]" />
                   <span>Generate Full Journey</span>
                 </button>
               </div>
             </div>
 
-            {/* 1-Tap Quick Prompt Suggestions */}
+            {/* 1-Tap Quick Prompt Blueprints */}
             <div className="space-y-3 pt-2">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#8C8881] block">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400 block">
                 Or Tap a Curated Journey Blueprint
               </span>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {PROMPT_TEMPLATES.map((tpl, idx) => (
                   <button
                     key={idx}
@@ -375,12 +377,12 @@ export const NewTripWizard: React.FC = () => {
                       setNaturalPrompt(tpl.prompt);
                       handleGenerateFromPrompt(tpl.prompt);
                     }}
-                    className="p-3.5 rounded-xl bg-[#FDFCFB] border border-[#E5E1DA] hover:border-[#1A1A1A] text-left transition-all group cursor-pointer hover:bg-white shadow-xs"
+                    className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.08] hover:border-[#E5C578]/50 text-left transition-all group cursor-pointer hover:bg-white/[0.06]"
                   >
-                    <h4 className="font-serif text-sm font-medium text-[#1A1A1A] group-hover:text-black">
+                    <h4 className="font-serif text-sm font-normal text-white group-hover:text-[#E5C578] transition-colors">
                       {tpl.title}
                     </h4>
-                    <p className="text-[11px] text-[#8C8881] line-clamp-2 mt-1 leading-relaxed">
+                    <p className="text-[11px] text-stone-400 line-clamp-2 mt-1.5 leading-relaxed">
                       {tpl.prompt}
                     </p>
                   </button>
@@ -390,31 +392,29 @@ export const NewTripWizard: React.FC = () => {
           </div>
         )}
 
-        {/* =========================================================================
-            MODE 2: QUICK DROPDOWNS & PRESETS (Easy select without typing)
-           ========================================================================= */}
+        {/* MODE 2: QUICK SELECTORS */}
         {creationMode === 'dropdown' && (
           <div className="space-y-6">
-            <div className="space-y-1 border-b border-[#E5E1DA] pb-3">
-              <h2 className="font-serif text-xl sm:text-2xl font-light text-[#1A1A1A] flex items-center gap-2">
-                <Zap className="w-5 h-5 text-blue-500" />
+            <div className="space-y-1 border-b border-white/[0.08] pb-3">
+              <h2 className="font-serif text-xl sm:text-2xl font-light text-white flex items-center gap-2">
+                <Zap className="w-5 h-5 text-sky-400" />
                 Zero-Typing Quick Selector
               </h2>
-              <p className="text-xs text-[#8C8881]">
-                Select pre-curated destinations, durations, and budget tiers with simple taps.
+              <p className="text-xs text-stone-400">
+                Select pre-curated destinations, durations, and budget tiers with single gestures.
               </p>
             </div>
 
-            {/* 1. Destination Dropdown / Chips */}
+            {/* 1. Destination Dropdown */}
             <div className="space-y-3">
-              <label className="block text-[10px] font-bold uppercase tracking-widest text-[#8C8881]">
+              <label className="block text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400">
                 1. Select Destination from World Regions
               </label>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {POPULAR_REGIONS.map((reg) => (
-                  <div key={reg.region} className="p-3.5 rounded-xl border border-[#E5E1DA] bg-[#FDFCFB] space-y-2">
-                    <span className="text-[10px] font-mono uppercase font-bold text-[#8C8881] block">
+                  <div key={reg.region} className="p-3.5 rounded-2xl border border-white/[0.08] bg-white/[0.02] space-y-2">
+                    <span className="text-[10px] font-mono uppercase font-bold text-[#E5C578] block">
                       {reg.region}
                     </span>
                     <div className="flex flex-wrap gap-1.5">
@@ -424,10 +424,10 @@ export const NewTripWizard: React.FC = () => {
                           <button
                             key={d.city}
                             onClick={() => handleSelectQuickDestination(d.city, d.country)}
-                            className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                            className={`px-3 py-1 rounded-xl text-xs font-medium transition-all cursor-pointer ${
                               isSelected
-                                ? 'bg-[#1A1A1A] text-white shadow-xs'
-                                : 'bg-white border border-[#E5E1DA] text-[#1A1A1A] hover:border-[#1A1A1A]'
+                                ? 'bg-[#E5C578] text-black font-bold shadow-sm'
+                                : 'bg-white/[0.04] border border-white/[0.08] text-stone-300 hover:border-white/20'
                             }`}
                           >
                             {d.city}
@@ -442,7 +442,7 @@ export const NewTripWizard: React.FC = () => {
 
             {/* 2. Duration Preset Chips */}
             <div className="space-y-2">
-              <label className="block text-[10px] font-bold uppercase tracking-widest text-[#8C8881]">
+              <label className="block text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400">
                 2. Journey Duration
               </label>
               <div className="flex flex-wrap gap-2">
@@ -456,7 +456,7 @@ export const NewTripWizard: React.FC = () => {
                   <button
                     key={d.days}
                     onClick={() => handleSelectPresetDuration(d.days)}
-                    className="px-3 py-2 rounded-xl border border-[#E5E1DA] text-xs font-semibold bg-white hover:border-[#1A1A1A] cursor-pointer"
+                    className="px-3.5 py-2 rounded-xl border border-white/[0.08] text-xs font-medium bg-white/[0.03] hover:border-white/20 text-stone-200 cursor-pointer transition-colors"
                   >
                     {d.label}
                   </button>
@@ -466,8 +466,8 @@ export const NewTripWizard: React.FC = () => {
 
             {/* 3. Budget Range Chips */}
             <div className="space-y-2">
-              <label className="block text-[10px] font-bold uppercase tracking-widest text-[#8C8881]">
-                3. Total Target Budget ({currencyConfig.code})
+              <label className="block text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400">
+                3. Target Budget ({currencyConfig.code})
               </label>
               <div className="flex flex-wrap gap-2">
                 {[
@@ -479,10 +479,10 @@ export const NewTripWizard: React.FC = () => {
                   <button
                     key={b.val}
                     onClick={() => setBudget(b.val)}
-                    className={`px-3 py-2 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
+                    className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                       budget === b.val
-                        ? 'bg-[#1A1A1A] text-white shadow-xs'
-                        : 'bg-white border border-[#E5E1DA] text-[#1A1A1A] hover:border-[#1A1A1A]'
+                        ? 'bg-[#E5C578] text-black shadow-sm'
+                        : 'bg-white/[0.03] border border-white/[0.08] text-stone-300 hover:border-white/20'
                     }`}
                   >
                     {b.label}
@@ -493,20 +493,20 @@ export const NewTripWizard: React.FC = () => {
 
             {/* 4. Style Tags */}
             <div className="space-y-2">
-              <label className="block text-[10px] font-bold uppercase tracking-widest text-[#8C8881]">
+              <label className="block text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400">
                 4. Primary Travel Vibe
               </label>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-2">
                 {ALL_STYLE_TAGS.map((st) => {
                   const isSelected = selectedStyles.includes(st.id);
                   return (
                     <button
                       key={st.id}
                       onClick={() => toggleStyle(st.id)}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                      className={`px-3.5 py-1.5 rounded-xl text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
                         isSelected
-                          ? 'bg-[#1A1A1A] text-white shadow-xs'
-                          : 'bg-white border border-[#E5E1DA] text-[#1A1A1A] hover:border-[#1A1A1A]'
+                          ? 'bg-[#E5C578] text-black font-bold shadow-sm'
+                          : 'bg-white/[0.03] border border-white/[0.08] text-stone-300 hover:border-white/20'
                       }`}
                     >
                       <span>{st.icon}</span>
@@ -518,58 +518,56 @@ export const NewTripWizard: React.FC = () => {
             </div>
 
             {/* Launch Button */}
-            <div className="pt-4 border-t border-[#E5E1DA] flex items-center justify-between">
-              <div className="text-xs text-[#8C8881]">
-                Selected: <strong>{destinations[0]?.city || 'Tokyo'}</strong> for {budget ? formatCurrency(budget, baseCurrency) : ''}
+            <div className="pt-4 border-t border-white/[0.08] flex items-center justify-between">
+              <div className="text-xs text-stone-400">
+                Selected: <strong className="text-white">{destinations[0]?.city || 'Tokyo'}</strong> for {budget ? formatCurrency(budget, baseCurrency) : ''}
               </div>
 
               <button
                 onClick={handleStructuredGenerate}
-                className="py-2.5 px-6 rounded-xl bg-[#1A1A1A] text-white text-xs font-semibold hover:bg-black transition-all flex items-center gap-2 shadow-xs cursor-pointer"
+                className="py-2.5 px-6 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#E5C578] to-[#C59B27] hover:brightness-110 text-[#090A0E] text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 shadow-lg shadow-[#D4AF37]/20 btn-tactile cursor-pointer"
               >
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                <span>Build Itinerary with Gemini</span>
+                <Sparkles className="w-3.5 h-3.5 text-[#090A0E]" />
+                <span>Build Itinerary</span>
               </button>
             </div>
           </div>
         )}
 
-        {/* =========================================================================
-            MODE 3: MANUAL MULTI-STEP WIZARD
-           ========================================================================= */}
+        {/* MODE 3: CUSTOM STEP-BY-STEP */}
         {creationMode === 'manual' && (
           <div className="space-y-6">
             
             {/* Step Indicators */}
-            <div className="flex items-center justify-center gap-2 sm:gap-4 max-w-md mx-auto pb-2">
+            <div className="flex items-center justify-center gap-3 sm:gap-6 max-w-md mx-auto pb-2">
               {[
                 { num: 1, label: 'Destinations' },
-                { num: 2, label: 'Dates & Travelers' },
-                { num: 3, label: 'Style & Budget' },
+                { num: 2, label: 'Dates' },
+                { num: 3, label: 'Preferences' },
               ].map((s) => (
                 <div key={s.num} className="flex items-center gap-2">
                   <button
                     onClick={() => setStep(s.num)}
-                    className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
                       step === s.num
-                        ? 'bg-[#1A1A1A] text-white shadow-xs'
+                        ? 'bg-[#E5C578] text-black shadow-sm'
                         : step > s.num
-                        ? 'bg-[#E5E1DA] text-[#1A1A1A] cursor-pointer'
-                        : 'bg-[#FDFCFB] border border-[#E5E1DA] text-[#8C8881]'
+                        ? 'bg-white/10 text-white cursor-pointer'
+                        : 'bg-white/[0.03] border border-white/[0.08] text-stone-400'
                     }`}
                   >
-                    {step > s.num ? <CheckCircle2 className="w-3.5 h-3.5" /> : s.num}
+                    {step > s.num ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> : s.num}
                   </button>
-                  {s.num < 3 && <div className={`w-6 sm:w-10 h-[1px] ${step > s.num ? 'bg-[#1A1A1A]' : 'bg-[#E5E1DA]'}`} />}
+                  {s.num < 3 && <div className={`w-8 sm:w-12 h-[1px] ${step > s.num ? 'bg-[#E5C578]' : 'bg-white/[0.08]'}`} />}
                 </div>
               ))}
             </div>
 
-            {/* STEP 1: Destinations */}
+            {/* STEP 1 */}
             {step === 1 && (
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <label className="block text-[10px] font-bold uppercase tracking-widest text-[#8C8881]">
+                  <label className="block text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400">
                     Trip Title
                   </label>
                   <input
@@ -577,16 +575,16 @@ export const NewTripWizard: React.FC = () => {
                     value={tripTitle}
                     onChange={(e) => setTripTitle(e.target.value)}
                     placeholder="e.g. Japan Blossom Quest"
-                    className="w-full px-3.5 py-2 rounded-xl bg-[#FDFCFB] border border-[#E5E1DA] text-xs font-semibold text-[#1A1A1A]"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#0D0F15] border border-white/[0.1] text-xs font-medium text-white placeholder:text-stone-500 focus:outline-none focus:border-[#E5C578]/60"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="block text-[10px] font-bold uppercase tracking-widest text-[#8C8881]">
+                  <label className="block text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400">
                     Destinations
                   </label>
                   {destinations.map((dest, idx) => (
-                    <div key={idx} className="flex items-center gap-2 p-2.5 rounded-xl bg-[#FDFCFB] border border-[#E5E1DA]">
+                    <div key={idx} className="flex items-center gap-2 p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.08]">
                       <input
                         type="text"
                         value={dest.city}
@@ -596,7 +594,7 @@ export const NewTripWizard: React.FC = () => {
                           setDestinations(updated);
                         }}
                         placeholder="City (e.g. Tokyo)"
-                        className="flex-1 px-3 py-1.5 rounded-lg bg-white border border-[#E5E1DA] text-xs font-semibold"
+                        className="flex-1 px-3 py-1.5 rounded-lg bg-[#0D0F15] border border-white/[0.08] text-xs font-medium text-white"
                       />
                       <input
                         type="text"
@@ -607,7 +605,7 @@ export const NewTripWizard: React.FC = () => {
                           setDestinations(updated);
                         }}
                         placeholder="Country (e.g. Japan)"
-                        className="flex-1 px-3 py-1.5 rounded-lg bg-white border border-[#E5E1DA] text-xs font-semibold"
+                        className="flex-1 px-3 py-1.5 rounded-lg bg-[#0D0F15] border border-white/[0.08] text-xs font-medium text-white"
                       />
                     </div>
                   ))}
@@ -616,7 +614,7 @@ export const NewTripWizard: React.FC = () => {
                 <div className="flex justify-end pt-2">
                   <button
                     onClick={() => setStep(2)}
-                    className="px-5 py-2.5 rounded-xl bg-[#1A1A1A] text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+                    className="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
                   >
                     <span>Next: Dates & Travelers</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -625,36 +623,36 @@ export const NewTripWizard: React.FC = () => {
               </div>
             )}
 
-            {/* STEP 2: Dates & Travelers */}
+            {/* STEP 2 */}
             {step === 2 && (
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[10px] font-bold uppercase tracking-widest text-[#8C8881] mb-1">
+                    <label className="block text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400 mb-1">
                       Start Date
                     </label>
                     <input
                       type="date"
                       value={startDate}
                       onChange={(e) => setStartDate(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-[#FDFCFB] border border-[#E5E1DA] text-xs font-semibold"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#0D0F15] border border-white/[0.1] text-xs font-medium text-white"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold uppercase tracking-widest text-[#8C8881] mb-1">
+                    <label className="block text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400 mb-1">
                       End Date
                     </label>
                     <input
                       type="date"
                       value={endDate}
                       onChange={(e) => setEndDate(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-[#FDFCFB] border border-[#E5E1DA] text-xs font-semibold"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-[#0D0F15] border border-white/[0.1] text-xs font-medium text-white"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-widest text-[#8C8881] mb-1">
+                  <label className="block text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400 mb-1">
                     Traveler Count
                   </label>
                   <input
@@ -663,20 +661,20 @@ export const NewTripWizard: React.FC = () => {
                     max={20}
                     value={travelerCount}
                     onChange={(e) => setTravelerCount(Number(e.target.value))}
-                    className="w-full px-3 py-2 rounded-xl bg-[#FDFCFB] border border-[#E5E1DA] text-xs font-semibold"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#0D0F15] border border-white/[0.1] text-xs font-medium text-white"
                   />
                 </div>
 
                 <div className="flex justify-between pt-2">
                   <button
                     onClick={() => setStep(1)}
-                    className="px-4 py-2 rounded-xl border border-[#E5E1DA] text-xs font-semibold cursor-pointer"
+                    className="px-4 py-2.5 rounded-xl border border-white/10 text-xs font-medium text-stone-300 cursor-pointer"
                   >
                     Back
                   </button>
                   <button
                     onClick={() => setStep(3)}
-                    className="px-5 py-2.5 rounded-xl bg-[#1A1A1A] text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+                    className="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
                   >
                     <span>Next: Style & Budget</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -685,23 +683,23 @@ export const NewTripWizard: React.FC = () => {
               </div>
             )}
 
-            {/* STEP 3: Style & Budget */}
+            {/* STEP 3 */}
             {step === 3 && (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-widest text-[#8C8881] mb-1">
+                  <label className="block text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400 mb-1">
                     Target Budget ({currencyConfig.code})
                   </label>
                   <input
                     type="number"
                     value={budget}
                     onChange={(e) => setBudget(Number(e.target.value))}
-                    className="w-full px-3 py-2 rounded-xl bg-[#FDFCFB] border border-[#E5E1DA] text-xs font-semibold"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#0D0F15] border border-white/[0.1] text-xs font-medium text-white"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="block text-[10px] font-bold uppercase tracking-widest text-[#8C8881]">
+                  <label className="block text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400">
                     Travel Style
                   </label>
                   <div className="grid grid-cols-2 gap-2">
@@ -710,13 +708,13 @@ export const NewTripWizard: React.FC = () => {
                         key={st.id}
                         type="button"
                         onClick={() => toggleStyle(st.id)}
-                        className={`p-2.5 rounded-xl border text-left text-xs transition-colors cursor-pointer ${
+                        className={`p-3 rounded-xl border text-left text-xs transition-all cursor-pointer ${
                           selectedStyles.includes(st.id)
-                            ? 'bg-[#1A1A1A] text-white border-[#1A1A1A]'
-                            : 'bg-[#FDFCFB] border-[#E5E1DA] text-[#1A1A1A]'
+                            ? 'bg-[#E5C578] text-black font-bold border-[#E5C578]'
+                            : 'bg-white/[0.03] border-white/[0.08] text-stone-300 hover:border-white/20'
                         }`}
                       >
-                        <div className="font-semibold">{st.icon} {st.label}</div>
+                        <div>{st.icon} {st.label}</div>
                       </button>
                     ))}
                   </div>
@@ -725,15 +723,15 @@ export const NewTripWizard: React.FC = () => {
                 <div className="flex justify-between pt-2">
                   <button
                     onClick={() => setStep(2)}
-                    className="px-4 py-2 rounded-xl border border-[#E5E1DA] text-xs font-semibold cursor-pointer"
+                    className="px-4 py-2.5 rounded-xl border border-white/10 text-xs font-medium text-stone-300 cursor-pointer"
                   >
                     Back
                   </button>
                   <button
                     onClick={handleStructuredGenerate}
-                    className="px-6 py-2.5 rounded-xl bg-[#1A1A1A] text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"
+                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#E5C578] to-[#C59B27] hover:brightness-110 text-[#090A0E] text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-lg shadow-[#D4AF37]/20 btn-tactile"
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                    <Sparkles className="w-3.5 h-3.5 text-[#090A0E]" />
                     <span>Create Journey</span>
                   </button>
                 </div>

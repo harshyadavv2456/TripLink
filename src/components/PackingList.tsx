@@ -19,13 +19,13 @@ import {
 } from 'lucide-react';
 
 const CATEGORY_MAP: Record<PackingCategory, { label: string; icon: any; color: string }> = {
-  clothing: { label: 'Clothing & Footwear', icon: Shirt, color: 'text-[#1A1A1A] bg-[#FDFCFB]' },
-  toiletries: { label: 'Toiletries & Care', icon: Heart, color: 'text-[#1A1A1A] bg-[#FDFCFB]' },
-  documents: { label: 'Passports & Docs', icon: FileText, color: 'text-[#1A1A1A] bg-[#FDFCFB]' },
-  electronics: { label: 'Tech & Cables', icon: Smartphone, color: 'text-[#1A1A1A] bg-[#FDFCFB]' },
-  tech: { label: 'Tech & Cables', icon: Smartphone, color: 'text-[#1A1A1A] bg-[#FDFCFB]' },
-  gear: { label: 'Outdoor Gear', icon: Wrench, color: 'text-[#1A1A1A] bg-[#FDFCFB]' },
-  essentials: { label: 'Daily Essentials', icon: Package, color: 'text-[#1A1A1A] bg-[#FDFCFB]' },
+  clothing: { label: 'Clothing & Footwear', icon: Shirt, color: 'text-[#E5C578] bg-white/[0.02]' },
+  toiletries: { label: 'Toiletries & Care', icon: Heart, color: 'text-[#E5C578] bg-white/[0.02]' },
+  documents: { label: 'Passports & Docs', icon: FileText, color: 'text-[#E5C578] bg-white/[0.02]' },
+  electronics: { label: 'Tech & Cables', icon: Smartphone, color: 'text-[#E5C578] bg-white/[0.02]' },
+  tech: { label: 'Tech & Cables', icon: Smartphone, color: 'text-[#E5C578] bg-white/[0.02]' },
+  gear: { label: 'Outdoor Gear', icon: Wrench, color: 'text-[#E5C578] bg-white/[0.02]' },
+  essentials: { label: 'Daily Essentials', icon: Package, color: 'text-[#E5C578] bg-white/[0.02]' },
 };
 
 interface PackingListProps {
@@ -58,11 +58,11 @@ export const PackingList: React.FC<PackingListProps> = ({ trip }) => {
   // New template name state
   const [templateName, setTemplateName] = useState<string>(`${trip.destinations[0]?.country || 'Travel'} Essentials`);
 
-  const packedCount = trip.packingList.filter((p) => p.packed).length;
-  const totalCount = trip.packingList.length;
+  const packedCount = (trip.packingList || []).filter((p) => p.packed).length;
+  const totalCount = (trip.packingList || []).length;
   const progressPercent = totalCount > 0 ? Math.round((packedCount / totalCount) * 100) : 0;
 
-  const filteredItems = trip.packingList.filter((item) => {
+  const filteredItems = (trip.packingList || []).filter((item) => {
     if (selectedCategory === 'all') return true;
     return item.category === selectedCategory;
   });
@@ -93,20 +93,20 @@ export const PackingList: React.FC<PackingListProps> = ({ trip }) => {
     <div className="space-y-6">
       
       {/* Packing Header & Controls */}
-      <div className="bg-white rounded-2xl p-6 sm:p-8 border border-[#E5E1DA] shadow-xs space-y-6">
+      <div className="luxury-card rounded-3xl p-6 sm:p-8 border-white/[0.08] shadow-2xl space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#8C8881]">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#E5C578]">
               Preparation & Gear
             </span>
             <div className="flex items-center gap-2 mt-0.5">
-              <Luggage className="w-5 h-5 text-[#1A1A1A]" />
-              <h2 className="font-serif text-2xl sm:text-3xl font-light text-[#1A1A1A]">
+              <Luggage className="w-5 h-5 text-[#E5C578]" />
+              <h2 className="font-serif text-2xl sm:text-3xl font-light text-white">
                 Packing Checklist & Library
               </h2>
             </div>
-            <p className="text-xs text-[#8C8881] mt-1">
-              Curated for {trip.destinations.map((d) => d.city).join(', ')} ({trip.days.length} days, {trip.travelerCount} travelers).
+            <p className="text-xs text-stone-400 mt-1">
+              Curated for {(trip.destinations || []).map((d) => d.city).join(', ') || 'Your Journey'} ({(trip.days || []).length} days, {trip.travelerCount} travelers).
             </p>
           </div>
 
@@ -115,43 +115,43 @@ export const PackingList: React.FC<PackingListProps> = ({ trip }) => {
             <button
               onClick={() => generatePackingListAI(trip.id)}
               disabled={isLoading}
-              className="px-3.5 py-2 rounded-xl bg-[#1A1A1A] hover:bg-stone-800 text-white text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 shadow-xs cursor-pointer transition-all"
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#E5C578] to-[#C59B27] text-[#090A0E] text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-lg shadow-[#D4AF37]/20 btn-tactile cursor-pointer transition-all"
             >
-              <Sparkles className="w-3.5 h-3.5 text-white" />
-              <span>Regenerate AI List</span>
+              <Sparkles className="w-3.5 h-3.5 text-[#090A0E]" />
+              <span>Generate AI List</span>
             </button>
 
             <button
               onClick={() => setShowLoadTemplateModal(true)}
-              className="px-3.5 py-2 rounded-xl bg-[#FDFCFB] hover:bg-white border border-[#E5E1DA] text-[#8C8881] hover:text-[#1A1A1A] text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 shadow-xs cursor-pointer"
+              className="px-3.5 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-stone-300 hover:text-white text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer"
             >
-              <Download className="w-3.5 h-3.5" />
+              <Download className="w-3.5 h-3.5 text-[#E5C578]" />
               <span>Load Template</span>
             </button>
 
             <button
               onClick={() => setShowSaveTemplateModal(true)}
-              className="px-3.5 py-2 rounded-xl bg-[#FDFCFB] hover:bg-white border border-[#E5E1DA] text-[#8C8881] hover:text-[#1A1A1A] text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 shadow-xs cursor-pointer"
+              className="px-3.5 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-stone-300 hover:text-white text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer"
             >
-              <Bookmark className="w-3.5 h-3.5" />
-              <span>Save As Template</span>
+              <Bookmark className="w-3.5 h-3.5 text-[#E5C578]" />
+              <span>Save Template</span>
             </button>
           </div>
         </div>
 
         {/* Packing Progress Meter */}
-        <div className="space-y-2 pt-2 border-t border-[#E5E1DA]">
+        <div className="space-y-2 pt-2 border-t border-white/[0.08]">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-[#8C8881] flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-widest">
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#1A1A1A]" />
+            <span className="text-stone-400 flex items-center gap-1.5 text-[10px] font-mono uppercase font-bold tracking-widest">
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#E5C578]" />
               <span>{packedCount} of {totalCount} Items Packed</span>
             </span>
-            <span className="text-[#1A1A1A] font-mono text-xs font-bold">{progressPercent}% Ready</span>
+            <span className="text-[#E5C578] font-mono text-xs font-bold">{progressPercent}% Ready</span>
           </div>
 
-          <div className="w-full bg-[#FDFCFB] h-2 rounded-full overflow-hidden border border-[#E5E1DA]">
+          <div className="w-full bg-white/[0.04] h-2 rounded-full overflow-hidden border border-white/[0.08]">
             <div
-              className="h-full bg-[#1A1A1A] transition-all duration-300"
+              className="h-full bg-gradient-to-r from-[#D4AF37] to-[#E5C578] transition-all duration-300"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
@@ -163,27 +163,27 @@ export const PackingList: React.FC<PackingListProps> = ({ trip }) => {
         <div className="flex items-center gap-1.5">
           <button
             onClick={() => setSelectedCategory('all')}
-            className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer ${
+            className={`px-3.5 py-1.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-widest transition-all cursor-pointer ${
               selectedCategory === 'all'
-                ? 'bg-[#1A1A1A] text-white shadow-xs'
-                : 'bg-white text-[#8C8881] border border-[#E5E1DA] hover:text-[#1A1A1A]'
+                ? 'bg-white text-black shadow-sm'
+                : 'luxury-card text-stone-400 border-white/[0.08] hover:text-white'
             }`}
           >
             All ({totalCount})
           </button>
 
           {(Object.keys(CATEGORY_MAP) as PackingCategory[]).map((catKey) => {
-            const count = trip.packingList.filter((p) => p.category === catKey).length;
+            const count = (trip.packingList || []).filter((p) => p.category === catKey).length;
             const cat = CATEGORY_MAP[catKey];
 
             return (
               <button
                 key={catKey}
                 onClick={() => setSelectedCategory(catKey)}
-                className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all cursor-pointer ${
+                className={`px-3.5 py-1.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-widest whitespace-nowrap transition-all cursor-pointer ${
                   selectedCategory === catKey
-                    ? 'bg-[#1A1A1A] text-white shadow-xs'
-                    : 'bg-white text-[#8C8881] border border-[#E5E1DA] hover:text-[#1A1A1A]'
+                    ? 'bg-white text-black shadow-sm'
+                    : 'luxury-card text-stone-400 border-white/[0.08] hover:text-white'
                 }`}
               >
                 {cat.label.split(' ')[0]} ({count})
@@ -194,10 +194,10 @@ export const PackingList: React.FC<PackingListProps> = ({ trip }) => {
 
         <button
           onClick={() => setShowAddItem(true)}
-          className="px-3.5 py-1.5 rounded-xl bg-[#1A1A1A] hover:bg-stone-800 text-white text-[10px] font-bold uppercase tracking-widest flex items-center gap-1 shrink-0 shadow-xs cursor-pointer"
+          className="px-3.5 py-1.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-white text-[10px] font-mono font-bold uppercase tracking-widest flex items-center gap-1 shrink-0 cursor-pointer"
         >
-          <Plus className="w-3.5 h-3.5" />
-          <span>+ Add Item</span>
+          <Plus className="w-3.5 h-3.5 text-[#E5C578]" />
+          <span>Add Item</span>
         </button>
       </div>
 
@@ -210,40 +210,40 @@ export const PackingList: React.FC<PackingListProps> = ({ trip }) => {
             <div
               key={item.id}
               onClick={() => togglePackedItem(trip.id, item.id)}
-              className={`p-3.5 rounded-xl border flex items-center justify-between gap-3 transition-all cursor-pointer select-none group ${
+              className={`p-4 rounded-2xl border flex items-center justify-between gap-3 transition-all cursor-pointer select-none group ${
                 item.packed
-                  ? 'bg-[#FDFCFB] border-[#E5E1DA] opacity-50'
-                  : 'bg-white border-[#E5E1DA] hover:border-[#1A1A1A]'
+                  ? 'luxury-card border-white/[0.04] opacity-50'
+                  : 'luxury-card border-white/[0.08] hover:border-white/20'
               }`}
             >
               <div className="flex items-center gap-3">
                 <div
                   className={`w-4 h-4 rounded-md flex items-center justify-center transition-all ${
                     item.packed
-                      ? 'bg-[#1A1A1A] text-white'
-                      : 'border border-[#8C8881] group-hover:border-[#1A1A1A]'
+                      ? 'bg-[#E5C578] text-black'
+                      : 'border border-white/30 group-hover:border-[#E5C578]'
                   }`}
                 >
-                  {item.packed && <CheckCircle2 className="w-3.5 h-3.5" />}
+                  {item.packed && <CheckCircle2 className="w-3.5 h-3.5 text-black stroke-[2.5]" />}
                 </div>
 
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-2">
-                    <span className={`text-xs font-medium ${item.packed ? 'line-through text-[#8C8881]' : 'text-[#1A1A1A]'}`}>
+                    <span className={`text-xs font-medium ${item.packed ? 'line-through text-stone-500' : 'text-white'}`}>
                       {item.name}
                     </span>
                     {item.quantity > 1 && (
-                      <span className="text-[9px] font-mono font-bold bg-[#E5E1DA] text-[#1A1A1A] px-1.5 py-0.2 rounded">
+                      <span className="text-[9px] font-mono font-bold bg-white/10 text-[#E5C578] px-1.5 py-0.2 rounded">
                         x{item.quantity}
                       </span>
                     )}
                     {item.isEssential && (
-                      <span className="text-[8px] uppercase font-bold px-1.5 py-0.2 rounded bg-[#1A1A1A] text-white">
+                      <span className="text-[8px] font-mono uppercase font-bold px-1.5 py-0.2 rounded bg-[#E5C578]/20 text-[#E5C578] border border-[#E5C578]/30">
                         Essential
                       </span>
                     )}
                   </div>
-                  <span className="text-[9px] text-[#8C8881] uppercase tracking-wider">{cat.label}</span>
+                  <span className="text-[9px] text-stone-400 uppercase tracking-wider font-mono">{cat.label}</span>
                 </div>
               </div>
 
@@ -253,7 +253,7 @@ export const PackingList: React.FC<PackingListProps> = ({ trip }) => {
                   e.stopPropagation();
                   deletePackingItem(trip.id, item.id);
                 }}
-                className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-[#8C8881] hover:text-rose-600 transition-all cursor-pointer"
+                className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-stone-500 hover:text-rose-400 transition-all cursor-pointer"
                 title="Delete Item"
               >
                 <Trash2 className="w-3.5 h-3.5" />
@@ -261,20 +261,26 @@ export const PackingList: React.FC<PackingListProps> = ({ trip }) => {
             </div>
           );
         })}
+
+        {filteredItems.length === 0 && (
+          <div className="col-span-2 luxury-card rounded-2xl p-8 text-center text-xs text-stone-500">
+            No packing items found in this category. Click "+ Add Item" or generate with AI.
+          </div>
+        )}
       </div>
 
       {/* MODAL: Add Custom Packing Item */}
       {showAddItem && (
-        <div className="fixed inset-0 bg-[#1A1A1A]/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-xl border border-[#E5E1DA] space-y-5 animate-scale-in">
-            <div className="flex items-center justify-between border-b border-[#E5E1DA] pb-3">
-              <h3 className="font-serif text-xl font-light text-[#1A1A1A]">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="luxury-card-elevated rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border-white/20 space-y-5 animate-scale-in">
+            <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
+              <h3 className="font-serif text-xl font-light text-white">
                 Add Packing Item
               </h3>
               <button
                 type="button"
                 onClick={() => setShowAddItem(false)}
-                className="p-1.5 rounded-full hover:bg-[#F9F8F6] text-[#8C8881] hover:text-[#1A1A1A] cursor-pointer"
+                className="p-1.5 rounded-full hover:bg-white/10 text-stone-400 hover:text-white cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -282,7 +288,7 @@ export const PackingList: React.FC<PackingListProps> = ({ trip }) => {
 
             <form onSubmit={handleAddItemSubmit} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-[#8C8881]">
+                <label className="block text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400">
                   Item Name *
                 </label>
                 <input
@@ -291,19 +297,19 @@ export const PackingList: React.FC<PackingListProps> = ({ trip }) => {
                   value={newItemName}
                   onChange={(e) => setNewItemName(e.target.value)}
                   placeholder="e.g. Travel Adapter (Type C), Merino Wool Sweater"
-                  className="w-full px-3.5 py-2 rounded-xl bg-[#FDFCFB] border border-[#E5E1DA] text-xs font-semibold text-[#1A1A1A] focus:outline-none focus:border-[#1A1A1A]"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#0D0F15] border border-white/10 text-xs font-medium text-white placeholder:text-stone-500 focus:outline-none focus:border-[#E5C578]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="block text-[10px] font-bold uppercase tracking-widest text-[#8C8881]">
+                  <label className="block text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400">
                     Category
                   </label>
                   <select
                     value={newItemCategory}
                     onChange={(e) => setNewItemCategory(e.target.value as PackingCategory)}
-                    className="w-full px-3 py-2 rounded-xl bg-[#FDFCFB] border border-[#E5E1DA] text-xs font-semibold text-[#1A1A1A] focus:outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#0D0F15] border border-white/10 text-xs text-white focus:outline-none"
                   >
                     {Object.keys(CATEGORY_MAP).map((k) => (
                       <option key={k} value={k}>
@@ -314,7 +320,7 @@ export const PackingList: React.FC<PackingListProps> = ({ trip }) => {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block text-[10px] font-bold uppercase tracking-widest text-[#8C8881]">
+                  <label className="block text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400">
                     Quantity
                   </label>
                   <input
@@ -323,32 +329,32 @@ export const PackingList: React.FC<PackingListProps> = ({ trip }) => {
                     max={20}
                     value={newItemQty}
                     onChange={(e) => setNewItemQty(Number(e.target.value))}
-                    className="w-full px-3 py-2 rounded-xl bg-[#FDFCFB] border border-[#E5E1DA] text-xs font-semibold text-[#1A1A1A] focus:outline-none"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#0D0F15] border border-white/10 text-xs font-mono text-white focus:outline-none"
                   />
                 </div>
               </div>
 
-              <label className="flex items-center gap-2 text-xs font-semibold text-[#1A1A1A] cursor-pointer pt-1">
+              <label className="flex items-center gap-2 text-xs font-semibold text-white cursor-pointer pt-1">
                 <input
                   type="checkbox"
                   checked={newItemEssential}
                   onChange={(e) => setNewItemEssential(e.target.checked)}
-                  className="rounded accent-[#1A1A1A]"
+                  className="rounded accent-[#E5C578]"
                 />
-                <span className="text-[11px] text-[#8C8881]">Mark as Essential Priority Item</span>
+                <span className="text-[11px] text-stone-400 font-mono">Mark as Essential Priority Item</span>
               </label>
 
-              <div className="flex justify-end gap-3 pt-3 border-t border-[#E5E1DA]">
+              <div className="flex justify-end gap-2.5 pt-3 border-t border-white/[0.08]">
                 <button
                   type="button"
                   onClick={() => setShowAddItem(false)}
-                  className="px-4 py-2 rounded-xl border border-[#E5E1DA] hover:bg-[#F9F8F6] text-[#8C8881] text-[10px] font-bold uppercase tracking-widest cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl border border-white/10 text-stone-400 text-xs font-semibold cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-[#1A1A1A] hover:bg-stone-800 text-white text-[10px] font-bold uppercase tracking-widest shadow-xs cursor-pointer"
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#E5C578] to-[#C59B27] text-[#090A0E] text-xs font-bold uppercase tracking-wider cursor-pointer"
                 >
                   Add Item
                 </button>
@@ -360,27 +366,27 @@ export const PackingList: React.FC<PackingListProps> = ({ trip }) => {
 
       {/* MODAL: Save as Reusable Template */}
       {showSaveTemplateModal && (
-        <div className="fixed inset-0 bg-[#1A1A1A]/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-xl border border-[#E5E1DA] space-y-5 animate-scale-in">
-            <div className="flex items-center justify-between border-b border-[#E5E1DA] pb-3">
-              <h3 className="font-serif text-xl font-light text-[#1A1A1A]">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="luxury-card-elevated rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border-white/20 space-y-5 animate-scale-in">
+            <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
+              <h3 className="font-serif text-xl font-light text-white">
                 Save to Reusable Library
               </h3>
               <button
                 type="button"
                 onClick={() => setShowSaveTemplateModal(false)}
-                className="p-1.5 rounded-full hover:bg-[#F9F8F6] text-[#8C8881] hover:text-[#1A1A1A] cursor-pointer"
+                className="p-1.5 rounded-full hover:bg-white/10 text-stone-400 hover:text-white cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <p className="text-xs text-[#8C8881]">
-              Save this checklist ({trip.packingList.length} items) as a reusable template for any future trip.
+            <p className="text-xs text-stone-400">
+              Save this checklist ({(trip.packingList || []).length} items) as a reusable template for any future trip.
             </p>
 
             <div className="space-y-1.5">
-              <label className="block text-[10px] font-bold uppercase tracking-widest text-[#8C8881]">
+              <label className="block text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400">
                 Template Name
               </label>
               <input
@@ -388,22 +394,22 @@ export const PackingList: React.FC<PackingListProps> = ({ trip }) => {
                 value={templateName}
                 onChange={(e) => setTemplateName(e.target.value)}
                 placeholder="e.g., Summer Beach Vacation or 2-Week Asia Tour"
-                className="w-full px-3.5 py-2 rounded-xl bg-[#FDFCFB] border border-[#E5E1DA] text-xs font-semibold text-[#1A1A1A] focus:outline-none focus:border-[#1A1A1A]"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-[#0D0F15] border border-white/10 text-xs text-white placeholder:text-stone-500 focus:outline-none focus:border-[#E5C578]"
               />
             </div>
 
-            <div className="flex justify-end gap-3 pt-3 border-t border-[#E5E1DA]">
+            <div className="flex justify-end gap-2.5 pt-3 border-t border-white/[0.08]">
               <button
                 type="button"
                 onClick={() => setShowSaveTemplateModal(false)}
-                className="px-4 py-2 rounded-xl border border-[#E5E1DA] hover:bg-[#F9F8F6] text-[#8C8881] text-[10px] font-bold uppercase tracking-widest cursor-pointer"
+                className="px-4 py-2.5 rounded-xl border border-white/10 text-stone-400 text-xs font-semibold cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleSaveTemplate}
-                className="px-5 py-2 rounded-xl bg-[#1A1A1A] hover:bg-stone-800 text-white text-[10px] font-bold uppercase tracking-widest shadow-xs cursor-pointer"
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#E5C578] to-[#C59B27] text-[#090A0E] text-xs font-bold uppercase tracking-wider cursor-pointer"
               >
                 Save Template
               </button>
@@ -414,48 +420,52 @@ export const PackingList: React.FC<PackingListProps> = ({ trip }) => {
 
       {/* MODAL: Load Existing Template */}
       {showLoadTemplateModal && (
-        <div className="fixed inset-0 bg-[#1A1A1A]/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-6 sm:p-8 max-w-lg w-full shadow-xl border border-[#E5E1DA] space-y-5 animate-scale-in">
-            <div className="flex items-center justify-between border-b border-[#E5E1DA] pb-3">
-              <h3 className="font-serif text-xl font-light text-[#1A1A1A]">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="luxury-card-elevated rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border-white/20 space-y-5 animate-scale-in">
+            <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
+              <h3 className="font-serif text-xl font-light text-white">
                 Load Packing Template
               </h3>
               <button
                 type="button"
                 onClick={() => setShowLoadTemplateModal(false)}
-                className="p-1.5 rounded-full hover:bg-[#F9F8F6] text-[#8C8881] hover:text-[#1A1A1A] cursor-pointer"
+                className="p-1.5 rounded-full hover:bg-white/10 text-stone-400 hover:text-white cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="space-y-2.5 max-h-80 overflow-y-auto">
-              {packingTemplates.map((tmpl) => (
-                <div
-                  key={tmpl.id}
-                  className="p-3.5 rounded-xl bg-[#FDFCFB] border border-[#E5E1DA] hover:border-[#1A1A1A] transition-all flex items-center justify-between gap-3"
-                >
-                  <div className="space-y-0.5">
-                    <h4 className="font-medium text-xs sm:text-sm text-[#1A1A1A]">
-                      {tmpl.name}
-                    </h4>
-                    <span className="text-[10px] text-[#8C8881]">
-                      {tmpl.items.length} items • {tmpl.category || 'General'}
-                    </span>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      applyPackingTemplate(trip.id, tmpl.id);
-                      setShowLoadTemplateModal(false);
-                    }}
-                    className="px-3.5 py-1.5 rounded-xl bg-[#1A1A1A] hover:bg-stone-800 text-white text-[10px] font-bold uppercase tracking-widest shadow-xs cursor-pointer"
+              {packingTemplates.length === 0 ? (
+                <div className="text-center text-xs text-stone-500 py-6">No custom templates saved yet.</div>
+              ) : (
+                packingTemplates.map((tmpl) => (
+                  <div
+                    key={tmpl.id}
+                    className="p-4 rounded-2xl luxury-card border-white/[0.08] hover:border-white/20 transition-all flex items-center justify-between gap-3"
                   >
-                    Apply
-                  </button>
-                </div>
-              ))}
+                    <div className="space-y-0.5">
+                      <h4 className="font-medium text-xs sm:text-sm text-white">
+                        {tmpl.name}
+                      </h4>
+                      <span className="text-[10px] text-stone-400 font-mono">
+                        {tmpl.items.length} items • {tmpl.category || 'General'}
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        applyPackingTemplate(trip.id, tmpl.id);
+                        setShowLoadTemplateModal(false);
+                      }}
+                      className="px-3.5 py-1.5 rounded-xl bg-white text-black hover:bg-stone-200 text-[10px] font-mono font-bold uppercase tracking-widest shadow-sm cursor-pointer"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>

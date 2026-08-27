@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTrip } from '../context/TripContext';
 import { Trip, Activity, ActivityCategory, TimeBlock } from '../types';
+import { formatCurrency } from '../data/currencies';
 import {
   Sparkles,
   Plus,
@@ -40,6 +41,7 @@ interface ItineraryEditorProps {
 
 export const ItineraryEditor: React.FC<ItineraryEditorProps> = ({ trip }) => {
   const {
+    baseCurrency,
     addActivity,
     updateActivity,
     deleteActivity,
@@ -65,7 +67,7 @@ export const ItineraryEditor: React.FC<ItineraryEditorProps> = ({ trip }) => {
   const [newActReason, setNewActReason] = useState<string>('');
   const [newActNotes, setNewActNotes] = useState<string>('');
 
-  const currentDay = trip.days.find((d) => d.dayNumber === selectedDayNumber) || trip.days[0];
+  const currentDay = (trip.days || []).find((d) => d.dayNumber === selectedDayNumber) || trip.days[0];
 
   // Handle reorder up/down
   const handleMoveUp = (dayId: string, activities: Activity[], index: number) => {
@@ -148,21 +150,21 @@ export const ItineraryEditor: React.FC<ItineraryEditorProps> = ({ trip }) => {
 
   if (!trip.days || trip.days.length === 0) {
     return (
-      <div className="bg-white rounded-2xl p-12 text-center space-y-4 border border-[#E5E1DA] shadow-xs max-w-xl mx-auto">
-        <div className="w-12 h-12 rounded-xl bg-[#FDFCFB] border border-[#E5E1DA] text-[#1A1A1A] flex items-center justify-center mx-auto">
+      <div className="luxury-card rounded-3xl p-12 text-center space-y-4 max-w-xl mx-auto border-white/[0.08]">
+        <div className="w-12 h-12 rounded-2xl bg-white/[0.04] border border-white/10 text-[#E5C578] flex items-center justify-center mx-auto">
           <Compass className="w-6 h-6" />
         </div>
-        <h3 className="font-serif text-2xl font-light text-[#1A1A1A]">
+        <h3 className="font-serif text-2xl font-light text-white">
           No Itinerary Days Created
         </h3>
-        <p className="text-xs text-[#8C8881]">
+        <p className="text-xs text-stone-400">
           This trip is currently in draft. You can generate a full day-by-day plan using Gemini AI or add custom activities manually.
         </p>
         <button
           onClick={() => regenerateDayAI(trip.id, 1, 'Initial draft itinerary')}
-          className="px-5 py-2.5 rounded-xl bg-[#1A1A1A] hover:bg-stone-800 text-white font-bold text-xs flex items-center gap-2 mx-auto shadow-xs cursor-pointer"
+          className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#E5C578] to-[#C59B27] text-[#090A0E] font-bold text-xs flex items-center gap-2 mx-auto shadow-lg cursor-pointer"
         >
-          <Sparkles className="w-3.5 h-3.5" />
+          <Sparkles className="w-3.5 h-3.5 text-[#090A0E]" />
           <span>Generate Day 1 with Gemini</span>
         </button>
       </div>
@@ -177,27 +179,27 @@ export const ItineraryEditor: React.FC<ItineraryEditorProps> = ({ trip }) => {
         <div className="flex items-center gap-2">
           {trip.days.map((day) => {
             const isSelected = day.dayNumber === selectedDayNumber;
-            const completedCount = day.activities.filter((a) => a.completed).length;
+            const completedCount = (day.activities || []).filter((a) => a.completed).length;
 
             return (
               <button
                 key={day.id}
                 onClick={() => setSelectedDayNumber(day.dayNumber)}
-                className={`px-4 py-2.5 rounded-xl border text-left transition-all shrink-0 cursor-pointer ${
+                className={`px-4 py-2.5 rounded-2xl border text-left transition-all shrink-0 cursor-pointer ${
                   isSelected
-                    ? 'bg-[#1A1A1A] text-white border-[#1A1A1A] shadow-xs'
-                    : 'bg-white text-[#8C8881] border-[#E5E1DA] hover:text-[#1A1A1A]'
+                    ? 'luxury-card-elevated border-[#E5C578]/50 shadow-lg'
+                    : 'luxury-card border-white/[0.08] hover:border-white/20'
                 }`}
               >
                 <div className="flex items-center gap-1.5">
-                  <span className={`text-[9px] font-bold uppercase tracking-widest ${isSelected ? 'text-white' : 'text-[#8C8881]'}`}>
+                  <span className={`text-[9px] font-mono font-bold uppercase tracking-widest ${isSelected ? 'text-[#E5C578]' : 'text-stone-500'}`}>
                     Day {day.dayNumber}
                   </span>
-                  {completedCount === day.activities.length && day.activities.length > 0 && (
+                  {completedCount === (day.activities || []).length && (day.activities || []).length > 0 && (
                     <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                   )}
                 </div>
-                <div className={`font-semibold text-xs truncate max-w-[120px] ${isSelected ? 'text-white' : 'text-[#1A1A1A]'}`}>
+                <div className={`font-medium text-xs truncate max-w-[120px] ${isSelected ? 'text-white font-semibold' : 'text-stone-300'}`}>
                   {day.destination.split(',')[0]}
                 </div>
               </button>
@@ -212,57 +214,57 @@ export const ItineraryEditor: React.FC<ItineraryEditorProps> = ({ trip }) => {
               setTargetAddDayId(currentDay.id);
               setShowAddModal(true);
             }}
-            className="px-3.5 py-2 rounded-xl bg-white hover:bg-[#FDFCFB] border border-[#E5E1DA] text-[#1A1A1A] text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 shadow-xs cursor-pointer"
+            className="px-4 py-2.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-white text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer"
           >
-            <Plus className="w-3.5 h-3.5" />
+            <Plus className="w-3.5 h-3.5 text-[#E5C578]" />
             <span>Add Activity</span>
           </button>
 
           <button
             onClick={() => setShowRegenModal(true)}
-            className="px-3.5 py-2 rounded-xl bg-[#1A1A1A] hover:bg-stone-800 text-white text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 shadow-xs cursor-pointer transition-all"
+            className="px-4 py-2.5 rounded-xl bg-white text-black hover:bg-stone-200 text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-lg cursor-pointer transition-all"
             title="Regenerate this specific day in context of previous/next days"
           >
-            <Sparkles className="w-3.5 h-3.5 text-white" />
-            <span>Regenerate Day {currentDay?.dayNumber}</span>
+            <Sparkles className="w-3.5 h-3.5 text-black" />
+            <span>Re-craft Day {currentDay?.dayNumber}</span>
           </button>
         </div>
       </div>
 
       {/* Active Day Header Banner */}
       {currentDay && (
-        <div className="bg-white rounded-2xl p-6 sm:p-8 border border-[#E5E1DA] shadow-xs space-y-2">
+        <div className="luxury-card rounded-3xl p-6 sm:p-8 border-white/[0.08] space-y-2">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div className="space-y-1">
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#8C8881]">
-                <span className="text-[10px] uppercase font-mono font-bold px-2 py-0.5 rounded bg-[#E5E1DA] text-[#1A1A1A]">
+              <div className="flex items-center gap-2 text-xs font-semibold text-stone-400">
+                <span className="text-[10px] uppercase font-mono font-bold px-2 py-0.5 rounded bg-white/10 text-[#E5C578]">
                   Day {currentDay.dayNumber}
                 </span>
                 <span>•</span>
-                <span className="font-mono text-[11px]">{currentDay.date}</span>
+                <span className="font-mono text-[11px] text-stone-300">{currentDay.date}</span>
                 <span>•</span>
-                <span className="flex items-center gap-1 text-[#1A1A1A] font-semibold text-[11px]">
-                  <MapPin className="w-3 h-3 text-[#8C8881]" />
+                <span className="flex items-center gap-1 text-white font-medium text-[11px]">
+                  <MapPin className="w-3 h-3 text-[#E5C578]" />
                   {currentDay.destination}
                 </span>
               </div>
 
-              <h2 className="font-serif text-2xl sm:text-3xl font-light text-[#1A1A1A]">
+              <h2 className="font-serif text-2xl sm:text-3xl font-light text-white">
                 {currentDay.title}
               </h2>
             </div>
 
-            <div className="flex items-center gap-2 text-xs">
-              <div className="bg-[#FDFCFB] px-3 py-1.5 rounded-lg border border-[#E5E1DA] text-[#8C8881]">
+            <div className="flex items-center gap-2 text-xs font-mono">
+              <div className="luxury-card px-3.5 py-1.5 rounded-xl border-white/[0.08] text-stone-400">
                 <span className="text-[10px] uppercase font-bold tracking-wider">Est. Spend: </span>
-                <span className="font-mono font-bold text-[#1A1A1A]">
-                  ${currentDay.activities.reduce((s, a) => s + (a.estCost || 0), 0)}
+                <span className="font-bold text-[#E5C578]">
+                  {formatCurrency((currentDay.activities || []).reduce((s, a) => s + (a.estCost || 0), 0), baseCurrency)}
                 </span>
               </div>
 
-              <div className="bg-[#FDFCFB] px-3 py-1.5 rounded-lg border border-[#E5E1DA] text-[#8C8881]">
+              <div className="luxury-card px-3.5 py-1.5 rounded-xl border-white/[0.08] text-stone-400">
                 <span className="text-[10px] uppercase font-bold tracking-wider">Stops: </span>
-                <span className="font-bold text-[#1A1A1A]">{currentDay.activities.length}</span>
+                <span className="font-bold text-white">{(currentDay.activities || []).length}</span>
               </div>
             </div>
           </div>
@@ -271,15 +273,15 @@ export const ItineraryEditor: React.FC<ItineraryEditorProps> = ({ trip }) => {
 
       {/* Activity Timeline List for Current Day */}
       <div className="space-y-3">
-        {currentDay && currentDay.activities.map((act, index) => {
+        {currentDay && (currentDay.activities || []).map((act, index) => {
           const catConfig = CATEGORY_CONFIG[act.category] || CATEGORY_CONFIG.sightseeing;
           const CategoryIcon = catConfig.icon;
 
           return (
             <div
               key={act.id}
-              className={`group bg-white rounded-xl p-5 border border-[#E5E1DA] shadow-xs transition-all relative ${
-                act.completed ? 'bg-[#FDFCFB] opacity-60' : 'hover:border-[#1A1A1A]'
+              className={`group luxury-card rounded-2xl p-5 border-white/[0.08] transition-all relative ${
+                act.completed ? 'opacity-50' : 'hover:border-white/20'
               }`}
             >
               <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
@@ -291,64 +293,64 @@ export const ItineraryEditor: React.FC<ItineraryEditorProps> = ({ trip }) => {
                   <button
                     type="button"
                     onClick={() => updateActivity(trip.id, currentDay.id, act.id, { completed: !act.completed })}
-                    className="mt-1 text-[#8C8881] hover:text-[#1A1A1A] transition-colors shrink-0 cursor-pointer"
+                    className="mt-1 text-stone-500 hover:text-[#E5C578] transition-colors shrink-0 cursor-pointer"
                     title={act.completed ? 'Mark uncompleted' : 'Mark completed'}
                   >
                     {act.completed ? (
-                      <CheckCircle2 className="w-5 h-5 text-[#1A1A1A]" />
+                      <CheckCircle2 className="w-5 h-5 text-emerald-400" />
                     ) : (
-                      <div className="w-4 h-4 rounded border border-[#8C8881] hover:border-[#1A1A1A]" />
+                      <div className="w-4 h-4 rounded-md border border-white/20 hover:border-[#E5C578]" />
                     )}
                   </button>
 
                   {/* Category Badge Icon */}
-                  <div className="p-2 rounded-lg border border-[#E5E1DA] bg-[#FDFCFB] shrink-0">
-                    <CategoryIcon className="w-4 h-4 text-[#1A1A1A]" />
+                  <div className="p-2.5 rounded-xl border border-white/10 bg-white/[0.02] shrink-0 text-[#E5C578]">
+                    <CategoryIcon className="w-4 h-4" />
                   </div>
 
                   {/* Activity Details */}
                   <div className="space-y-1.5 flex-1">
                     
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded bg-[#E5E1DA] text-[#1A1A1A]">
+                      <span className="text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded bg-white/10 text-[#E5C578]">
                         {act.time || (act.timeBlock === 'morning' ? '09:30 AM' : act.timeBlock === 'afternoon' ? '02:00 PM' : '07:30 PM')}
                       </span>
 
-                      <span className="text-[10px] uppercase font-bold text-[#8C8881] tracking-wider">
+                      <span className="text-[10px] uppercase font-mono font-bold text-stone-400 tracking-wider">
                         {act.timeBlock}
                       </span>
 
-                      <span className="text-[9px] uppercase font-bold px-2 py-0.5 rounded border border-[#E5E1DA] text-[#1A1A1A] bg-[#FDFCFB]">
+                      <span className="text-[9px] uppercase font-mono font-bold px-2 py-0.5 rounded border border-white/10 text-stone-300 bg-white/[0.02]">
                         {catConfig.label}
                       </span>
 
                       {act.estCost > 0 && (
-                        <span className="text-[10px] font-mono font-bold text-[#1A1A1A] bg-[#FDFCFB] px-2 py-0.5 rounded border border-[#E5E1DA]">
-                          ${act.estCost}
+                        <span className="text-[10px] font-mono font-bold text-[#E5C578] bg-white/[0.04] px-2 py-0.5 rounded border border-white/10">
+                          {formatCurrency(act.estCost, baseCurrency)}
                         </span>
                       )}
                     </div>
 
-                    <h3 className={`font-serif text-lg font-light text-[#1A1A1A] ${act.completed ? 'line-through text-[#8C8881]' : ''}`}>
+                    <h3 className={`font-serif text-lg font-normal text-white ${act.completed ? 'line-through text-stone-500' : ''}`}>
                       {act.name}
                     </h3>
 
                     {act.location && (
-                      <div className="text-xs text-[#8C8881] flex items-center gap-1">
-                        <MapPin className="w-3 h-3 text-[#8C8881]" />
+                      <div className="text-xs text-stone-400 flex items-center gap-1">
+                        <MapPin className="w-3 h-3 text-stone-500" />
                         {act.location}
                       </div>
                     )}
 
                     {act.reason && (
-                      <p className="text-xs text-[#8C8881] leading-relaxed bg-[#FDFCFB] p-2.5 rounded-lg border border-[#E5E1DA]">
-                        <span className="font-semibold text-[#1A1A1A]">Style Context: </span>
+                      <p className="text-xs text-stone-400 leading-relaxed bg-white/[0.02] p-3 rounded-xl border border-white/[0.06] font-light">
+                        <span className="font-semibold text-stone-200">Context: </span>
                         {act.reason}
                       </p>
                     )}
 
                     {act.notes && (
-                      <div className="text-xs text-[#1A1A1A] bg-[#FDFCFB] p-2 rounded-lg border border-[#E5E1DA]">
+                      <div className="text-xs text-stone-300 bg-white/[0.02] p-2.5 rounded-xl border border-white/[0.06]">
                         💡 {act.notes}
                       </div>
                     )}
@@ -356,15 +358,15 @@ export const ItineraryEditor: React.FC<ItineraryEditorProps> = ({ trip }) => {
                 </div>
 
                 {/* Right: Actions (Reorder, Edit, Delete, Move Day) */}
-                <div className="flex lg:flex-col items-center justify-end gap-1.5 pt-2 lg:pt-0 border-t lg:border-t-0 border-[#E5E1DA] shrink-0">
+                <div className="flex lg:flex-col items-center justify-end gap-1.5 pt-2 lg:pt-0 border-t lg:border-t-0 border-white/[0.08] shrink-0">
                   
                   {/* Reorder Buttons */}
-                  <div className="flex items-center gap-0.5 bg-[#FDFCFB] border border-[#E5E1DA] p-0.5 rounded-lg">
+                  <div className="flex items-center gap-0.5 bg-white/[0.02] border border-white/10 p-0.5 rounded-xl">
                     <button
                       type="button"
                       disabled={index === 0}
                       onClick={() => handleMoveUp(currentDay.id, currentDay.activities, index)}
-                      className="p-1 rounded text-[#8C8881] hover:text-[#1A1A1A] disabled:opacity-20 cursor-pointer"
+                      className="p-1 rounded text-stone-400 hover:text-white disabled:opacity-20 cursor-pointer"
                       title="Move Up"
                     >
                       <MoveUp className="w-3.5 h-3.5" />
@@ -373,7 +375,7 @@ export const ItineraryEditor: React.FC<ItineraryEditorProps> = ({ trip }) => {
                       type="button"
                       disabled={index === currentDay.activities.length - 1}
                       onClick={() => handleMoveDown(currentDay.id, currentDay.activities, index)}
-                      className="p-1 rounded text-[#8C8881] hover:text-[#1A1A1A] disabled:opacity-20 cursor-pointer"
+                      className="p-1 rounded text-stone-400 hover:text-white disabled:opacity-20 cursor-pointer"
                       title="Move Down"
                     >
                       <MoveDown className="w-3.5 h-3.5" />
@@ -389,7 +391,7 @@ export const ItineraryEditor: React.FC<ItineraryEditorProps> = ({ trip }) => {
                         }
                       }}
                       value=""
-                      className="text-[10px] font-semibold text-[#8C8881] bg-[#FDFCFB] hover:text-[#1A1A1A] rounded-lg px-2 py-1 border border-[#E5E1DA] focus:outline-none cursor-pointer"
+                      className="text-[10px] font-mono font-semibold text-stone-400 bg-[#0D0F15] hover:text-white rounded-xl px-2 py-1 border border-white/10 focus:outline-none cursor-pointer"
                       title="Move activity to another day"
                     >
                       <option value="" disabled>Move day...</option>
@@ -403,7 +405,7 @@ export const ItineraryEditor: React.FC<ItineraryEditorProps> = ({ trip }) => {
                   <button
                     type="button"
                     onClick={() => openEditModal(currentDay.id, act)}
-                    className="p-1.5 rounded-lg text-[#8C8881] hover:text-[#1A1A1A] hover:bg-[#FDFCFB] transition-colors cursor-pointer"
+                    className="p-1.5 rounded-xl text-stone-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                     title="Edit Activity"
                   >
                     <Edit3 className="w-3.5 h-3.5" />
@@ -413,7 +415,7 @@ export const ItineraryEditor: React.FC<ItineraryEditorProps> = ({ trip }) => {
                   <button
                     type="button"
                     onClick={() => deleteActivity(trip.id, currentDay.id, act.id)}
-                    className="p-1.5 rounded-lg text-[#8C8881] hover:text-rose-600 transition-colors cursor-pointer"
+                    className="p-1.5 rounded-xl text-stone-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
                     title="Delete Activity"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -424,11 +426,11 @@ export const ItineraryEditor: React.FC<ItineraryEditorProps> = ({ trip }) => {
 
               {/* Transit connector between stops */}
               {index < currentDay.activities.length - 1 && (
-                <div className="mt-3 pt-2.5 border-t border-dashed border-[#E5E1DA] flex items-center justify-between text-xs text-[#8C8881]">
+                <div className="mt-3 pt-2.5 border-t border-dashed border-white/[0.08] flex items-center justify-between text-xs text-stone-400">
                   <div className="flex items-center gap-1.5">
-                    <Footprints className="w-3.5 h-3.5 text-[#8C8881]" />
-                    <span className="text-[10px]">Transit to next stop:</span>
-                    <span className="font-mono text-[10px] font-semibold text-[#1A1A1A] bg-[#FDFCFB] px-1.5 py-0.5 rounded border border-[#E5E1DA]">
+                    <Footprints className="w-3.5 h-3.5 text-[#E5C578]" />
+                    <span className="text-[10px] font-mono">Transit to next stop:</span>
+                    <span className="font-mono text-[10px] text-[#E5C578] bg-white/[0.04] px-2 py-0.5 rounded-lg border border-white/10">
                       {act.travelTimeToNext || '15 min transit'} ({act.distanceToNext || '1.2 km'})
                     </span>
                   </div>
@@ -441,10 +443,10 @@ export const ItineraryEditor: React.FC<ItineraryEditorProps> = ({ trip }) => {
 
       {/* MODAL: Add / Edit Activity */}
       {(showAddModal || editingAct) && (
-        <div className="fixed inset-0 bg-[#1A1A1A]/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-6 sm:p-8 max-w-lg w-full shadow-xl border border-[#E5E1DA] space-y-5 animate-scale-in">
-            <div className="flex items-center justify-between border-b border-[#E5E1DA] pb-3">
-              <h3 className="font-serif text-xl font-light text-[#1A1A1A]">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="luxury-card-elevated rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border-white/20 space-y-5 animate-scale-in">
+            <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
+              <h3 className="font-serif text-xl font-light text-white">
                 {editingAct ? 'Edit Activity' : 'Add Custom Activity'}
               </h3>
               <button
@@ -453,7 +455,7 @@ export const ItineraryEditor: React.FC<ItineraryEditorProps> = ({ trip }) => {
                   setShowAddModal(false);
                   setEditingAct(null);
                 }}
-                className="p-1.5 rounded-full hover:bg-[#F9F8F6] text-[#8C8881] hover:text-[#1A1A1A] cursor-pointer"
+                className="p-1.5 rounded-full hover:bg-white/10 text-stone-400 hover:text-white cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -461,7 +463,7 @@ export const ItineraryEditor: React.FC<ItineraryEditorProps> = ({ trip }) => {
 
             <form onSubmit={handleSaveActivity} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-[#8C8881]">
+                <label className="block text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400">
                   Activity Name *
                 </label>
                 <input
@@ -470,19 +472,19 @@ export const ItineraryEditor: React.FC<ItineraryEditorProps> = ({ trip }) => {
                   value={newActName}
                   onChange={(e) => setNewActName(e.target.value)}
                   placeholder="e.g. Senso-ji Temple Dawn Walk or Osteria Francescana"
-                  className="w-full px-3.5 py-2 rounded-xl bg-[#FDFCFB] border border-[#E5E1DA] text-xs font-semibold text-[#1A1A1A] focus:outline-none focus:border-[#1A1A1A]"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#0D0F15] border border-white/10 text-xs font-medium text-white placeholder:text-stone-500 focus:outline-none focus:border-[#E5C578]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="block text-[10px] font-bold uppercase tracking-widest text-[#8C8881]">
+                  <label className="block text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400">
                     Time Block
                   </label>
                   <select
                     value={newActTimeBlock}
                     onChange={(e) => setNewActTimeBlock(e.target.value as TimeBlock)}
-                    className="w-full px-3 py-2 rounded-xl bg-[#FDFCFB] border border-[#E5E1DA] text-xs font-semibold text-[#1A1A1A] focus:outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#0D0F15] border border-white/10 text-xs text-white focus:outline-none"
                   >
                     <option value="morning">Morning</option>
                     <option value="afternoon">Afternoon</option>
@@ -492,7 +494,7 @@ export const ItineraryEditor: React.FC<ItineraryEditorProps> = ({ trip }) => {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block text-[10px] font-bold uppercase tracking-widest text-[#8C8881]">
+                  <label className="block text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400">
                     Time (e.g. 10:00 AM)
                   </label>
                   <input
@@ -500,20 +502,20 @@ export const ItineraryEditor: React.FC<ItineraryEditorProps> = ({ trip }) => {
                     value={newActTime}
                     onChange={(e) => setNewActTime(e.target.value)}
                     placeholder="10:00 AM"
-                    className="w-full px-3 py-2 rounded-xl bg-[#FDFCFB] border border-[#E5E1DA] text-xs font-semibold text-[#1A1A1A] focus:outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#0D0F15] border border-white/10 text-xs text-white focus:outline-none"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="block text-[10px] font-bold uppercase tracking-widest text-[#8C8881]">
+                  <label className="block text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400">
                     Category
                   </label>
                   <select
                     value={newActCategory}
                     onChange={(e) => setNewActCategory(e.target.value as ActivityCategory)}
-                    className="w-full px-3 py-2 rounded-xl bg-[#FDFCFB] border border-[#E5E1DA] text-xs font-semibold text-[#1A1A1A] focus:outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#0D0F15] border border-white/10 text-xs text-white focus:outline-none"
                   >
                     {Object.keys(CATEGORY_CONFIG).map((cat) => (
                       <option key={cat} value={cat}>
@@ -524,7 +526,7 @@ export const ItineraryEditor: React.FC<ItineraryEditorProps> = ({ trip }) => {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block text-[10px] font-bold uppercase tracking-widest text-[#8C8881]">
+                  <label className="block text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400">
                     Est. Cost (USD)
                   </label>
                   <input
@@ -532,13 +534,13 @@ export const ItineraryEditor: React.FC<ItineraryEditorProps> = ({ trip }) => {
                     min={0}
                     value={newActCost}
                     onChange={(e) => setNewActCost(Number(e.target.value))}
-                    className="w-full px-3 py-2 rounded-xl bg-[#FDFCFB] border border-[#E5E1DA] text-xs font-semibold text-[#1A1A1A] font-mono focus:outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-[#0D0F15] border border-white/10 text-xs text-white font-mono focus:outline-none"
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-[#8C8881]">
+                <label className="block text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400">
                   Location / Address
                 </label>
                 <input
@@ -546,12 +548,12 @@ export const ItineraryEditor: React.FC<ItineraryEditorProps> = ({ trip }) => {
                   value={newActLocation}
                   onChange={(e) => setNewActLocation(e.target.value)}
                   placeholder="e.g. Asakusa, Taito City, Tokyo"
-                  className="w-full px-3.5 py-2 rounded-xl bg-[#FDFCFB] border border-[#E5E1DA] text-xs text-[#1A1A1A] focus:outline-none"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#0D0F15] border border-white/10 text-xs text-white focus:outline-none"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-[#8C8881]">
+                <label className="block text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400">
                   Reason / Description
                 </label>
                 <textarea
@@ -559,24 +561,24 @@ export const ItineraryEditor: React.FC<ItineraryEditorProps> = ({ trip }) => {
                   value={newActReason}
                   onChange={(e) => setNewActReason(e.target.value)}
                   placeholder="Why this activity is special..."
-                  className="w-full px-3.5 py-2 rounded-xl bg-[#FDFCFB] border border-[#E5E1DA] text-xs text-[#1A1A1A] focus:outline-none"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[#0D0F15] border border-white/10 text-xs text-white focus:outline-none resize-none"
                 />
               </div>
 
-              <div className="flex justify-end gap-3 pt-3 border-t border-[#E5E1DA]">
+              <div className="flex justify-end gap-2.5 pt-3 border-t border-white/[0.08]">
                 <button
                   type="button"
                   onClick={() => {
                     setShowAddModal(false);
                     setEditingAct(null);
                   }}
-                  className="px-4 py-2 rounded-xl border border-[#E5E1DA] hover:bg-[#F9F8F6] text-[#8C8881] text-[10px] font-bold uppercase tracking-widest cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl border border-white/10 text-stone-400 text-xs font-semibold cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-[#1A1A1A] hover:bg-stone-800 text-white text-[10px] font-bold uppercase tracking-widest shadow-xs cursor-pointer"
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#E5C578] to-[#C59B27] text-[#090A0E] text-xs font-bold uppercase tracking-wider shadow-lg cursor-pointer"
                 >
                   {editingAct ? 'Update Activity' : 'Save to Day'}
                 </button>
@@ -588,30 +590,28 @@ export const ItineraryEditor: React.FC<ItineraryEditorProps> = ({ trip }) => {
 
       {/* MODAL: Regenerate Day with Gemini in Context */}
       {showRegenModal && (
-        <div className="fixed inset-0 bg-[#1A1A1A]/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-6 sm:p-8 max-w-lg w-full shadow-xl border border-[#E5E1DA] space-y-5 animate-scale-in">
-            <div className="flex items-center justify-between border-b border-[#E5E1DA] pb-3">
-              <div className="flex items-center gap-2">
-                <div>
-                  <h3 className="font-serif text-xl font-light text-[#1A1A1A]">
-                    Regenerate Day {currentDay?.dayNumber} Only
-                  </h3>
-                  <p className="text-xs text-[#8C8881]">
-                    Gemini AI will craft a new schedule for this day while harmonizing with adjacent days.
-                  </p>
-                </div>
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="luxury-card-elevated rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border-white/20 space-y-5 animate-scale-in">
+            <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
+              <div>
+                <h3 className="font-serif text-xl font-light text-white">
+                  Re-craft Day {currentDay?.dayNumber} Only
+                </h3>
+                <p className="text-xs text-stone-400">
+                  Gemini AI will craft a new schedule for this day while harmonizing with adjacent days.
+                </p>
               </div>
               <button
                 type="button"
                 onClick={() => setShowRegenModal(false)}
-                className="p-1.5 rounded-full hover:bg-[#F9F8F6] text-[#8C8881] hover:text-[#1A1A1A] cursor-pointer"
+                className="p-1.5 rounded-full hover:bg-white/10 text-stone-400 hover:text-white cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="space-y-2">
-              <label className="block text-[10px] font-bold uppercase tracking-widest text-[#8C8881]">
+              <label className="block text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400">
                 Any specific adjustments for this day? (Optional)
               </label>
               <textarea
@@ -619,31 +619,31 @@ export const ItineraryEditor: React.FC<ItineraryEditorProps> = ({ trip }) => {
                 value={regenFocusPrompt}
                 onChange={(e) => setRegenFocusPrompt(e.target.value)}
                 placeholder="e.g., Replace museum with scenic outdoor hike; focus entirely on local street food..."
-                className="w-full px-3.5 py-2.5 rounded-xl bg-[#FDFCFB] border border-[#E5E1DA] text-xs text-[#1A1A1A] focus:outline-none focus:border-[#1A1A1A]"
+                className="w-full px-4 py-2.5 rounded-xl bg-[#0D0F15] border border-white/10 text-xs text-white focus:outline-none focus:border-[#E5C578] resize-none"
               />
             </div>
 
-            <div className="bg-[#FDFCFB] p-3 rounded-xl border border-[#E5E1DA] text-xs text-[#8C8881] space-y-0.5">
-              <span className="font-bold text-[#1A1A1A] uppercase tracking-wider text-[10px] block">Cross-Trip Memory Active</span>
+            <div className="bg-white/[0.02] p-3.5 rounded-2xl border border-white/[0.08] text-xs text-stone-400 space-y-0.5">
+              <span className="font-bold text-white uppercase tracking-wider text-[10px] block font-mono">Cross-Trip Memory Active</span>
               <p className="text-[11px] leading-relaxed">
                 Gemini ensures all newly proposed stops on this day continue to exclude places from your memory bank.
               </p>
             </div>
 
-            <div className="flex justify-end gap-3 pt-2 border-t border-[#E5E1DA]">
+            <div className="flex justify-end gap-2.5 pt-2 border-t border-white/[0.08]">
               <button
                 type="button"
                 onClick={() => setShowRegenModal(false)}
-                className="px-4 py-2 rounded-xl border border-[#E5E1DA] hover:bg-[#F9F8F6] text-[#8C8881] text-[10px] font-bold uppercase tracking-widest cursor-pointer"
+                className="px-4 py-2.5 rounded-xl border border-white/10 text-stone-400 text-xs font-semibold cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleRegenerateDay}
-                className="px-5 py-2 rounded-xl bg-[#1A1A1A] hover:bg-stone-800 text-white text-[10px] font-bold uppercase tracking-widest shadow-xs flex items-center gap-1.5 cursor-pointer"
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#E5C578] to-[#C59B27] text-[#090A0E] text-xs font-bold uppercase tracking-wider shadow-lg flex items-center gap-1.5 cursor-pointer"
               >
-                <Sparkles className="w-3.5 h-3.5 text-white" />
+                <Sparkles className="w-3.5 h-3.5 text-[#090A0E]" />
                 <span>Re-craft Day {currentDay?.dayNumber}</span>
               </button>
             </div>

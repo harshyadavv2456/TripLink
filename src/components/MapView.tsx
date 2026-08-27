@@ -13,6 +13,7 @@ import {
   ZoomOut,
   Maximize2,
   Share2,
+  Sparkles,
 } from 'lucide-react';
 import L from 'leaflet';
 
@@ -67,8 +68,8 @@ export const MapView: React.FC<MapViewProps> = ({ trip }) => {
     const cityKey = (trip.destinations[0]?.city || 'Tokyo').toLowerCase().replace(/\s+/g, '');
     const defaultCoords = CITY_COORDINATES[cityKey] || [35.6762, 139.6503];
 
-    trip.days.forEach((day, dayIdx) => {
-      day.activities.forEach((act, actIdx) => {
+    (trip.days || []).forEach((day, dayIdx) => {
+      (day.activities || []).forEach((act, actIdx) => {
         // Derive reasonable lat/lng if not explicitly present
         const lat = act.lat || defaultCoords[0] + (dayIdx * 0.02 + actIdx * 0.008) * (actIdx % 2 === 0 ? 1 : -1);
         const lng = act.lng || defaultCoords[1] + (dayIdx * 0.015 + actIdx * 0.009) * (actIdx % 3 === 0 ? 1 : -1);
@@ -104,7 +105,7 @@ export const MapView: React.FC<MapViewProps> = ({ trip }) => {
         zoomControl: false,
       });
 
-      // CartoDB Positron / Clean Minimalist Tile layer
+      // CartoDB Dark Matter / Voyager
       L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
         maxZoom: 19,
@@ -128,7 +129,6 @@ export const MapView: React.FC<MapViewProps> = ({ trip }) => {
     const map = mapInstanceRef.current;
     if (!map) return;
 
-    // Clear old tile layers
     map.eachLayer((layer) => {
       if (layer instanceof L.TileLayer) {
         map.removeLayer(layer);
@@ -169,17 +169,17 @@ export const MapView: React.FC<MapViewProps> = ({ trip }) => {
       const isSelected = activeStopId === stop.activity.id;
       latLngs.push([stop.lat, stop.lng]);
 
-      // Custom Clean HTML Marker Pin
+      // Custom Gold/Obsidian HTML Marker Pin
       const customIcon = L.divIcon({
         className: 'custom-map-pin',
         html: `
           <div class="relative flex flex-col items-center group">
             <div class="w-8 h-8 rounded-full ${
-              isSelected ? 'bg-black ring-4 ring-black/20 scale-110' : 'bg-[#1A1A1A] hover:scale-105'
-            } text-white flex items-center justify-center font-mono text-[11px] font-bold shadow-md transition-all border-2 border-white cursor-pointer">
+              isSelected ? 'bg-[#E5C578] text-black ring-4 ring-[#E5C578]/40 scale-110' : 'bg-[#0E1017] text-[#E5C578] border-2 border-[#E5C578] hover:scale-105'
+            } flex items-center justify-center font-mono text-[11px] font-bold shadow-2xl transition-all cursor-pointer">
               ${stop.stopIndex}
             </div>
-            <div class="absolute top-9 px-2 py-0.5 bg-[#1A1A1A] text-white text-[10px] font-medium rounded-md whitespace-nowrap shadow-sm pointer-events-none opacity-90 group-hover:opacity-100 transition-opacity">
+            <div class="absolute top-9 px-2.5 py-0.5 bg-[#090A0E] text-white text-[10px] font-medium rounded-lg whitespace-nowrap shadow-xl pointer-events-none border border-white/10 opacity-90 group-hover:opacity-100 transition-opacity">
               ${stop.activity.name.length > 18 ? stop.activity.name.substring(0, 16) + '...' : stop.activity.name}
             </div>
           </div>
@@ -195,12 +195,12 @@ export const MapView: React.FC<MapViewProps> = ({ trip }) => {
       const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedLoc}`;
 
       const popupContent = `
-        <div class="p-1 space-y-1.5 font-sans min-w-[200px]">
-          <div class="text-[10px] uppercase font-mono font-bold text-stone-500">Day ${stop.day.dayNumber} • ${stop.activity.time || stop.activity.timeBlock}</div>
-          <div class="font-serif font-medium text-sm text-stone-900 leading-snug">${stop.activity.name}</div>
-          <div class="text-xs text-stone-600">${stop.activity.location || 'Local Landmark'}</div>
-          ${stop.activity.estCost > 0 ? `<div class="text-xs font-mono font-bold text-stone-900">${formatCurrency(stop.activity.estCost, baseCurrency)}</div>` : ''}
-          <a href="${googleMapsUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-600 hover:underline pt-1">
+        <div class="p-2 space-y-1.5 font-sans min-w-[200px] bg-[#0E1017] text-white rounded-xl">
+          <div class="text-[10px] uppercase font-mono font-bold text-[#E5C578]">Day ${stop.day.dayNumber} • ${stop.activity.time || stop.activity.timeBlock}</div>
+          <div class="font-serif font-medium text-sm text-white leading-snug">${stop.activity.name}</div>
+          <div class="text-xs text-stone-400">${stop.activity.location || 'Local Landmark'}</div>
+          ${stop.activity.estCost > 0 ? `<div class="text-xs font-mono font-bold text-[#E5C578]">${formatCurrency(stop.activity.estCost, baseCurrency)}</div>` : ''}
+          <a href="${googleMapsUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-[11px] font-semibold text-[#E5C578] hover:underline pt-1">
             Open in Google Maps ↗
           </a>
         </div>
@@ -212,18 +212,17 @@ export const MapView: React.FC<MapViewProps> = ({ trip }) => {
       });
     });
 
-    // Draw connecting path
+    // Draw connecting path in Gold
     if (latLngs.length > 1) {
       const polyline = L.polyline(latLngs, {
-        color: '#1A1A1A',
+        color: '#E5C578',
         weight: 3,
         dashArray: '6, 6',
-        opacity: 0.8,
+        opacity: 0.9,
       }).addTo(map);
       polylineRef.current = polyline;
     }
 
-    // Fit Bounds with padding
     if (latLngs.length > 0) {
       const bounds = L.latLngBounds(latLngs);
       map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
@@ -259,17 +258,17 @@ export const MapView: React.FC<MapViewProps> = ({ trip }) => {
     <div className="space-y-6 animate-in fade-in duration-300">
       
       {/* Map Header & Controls */}
-      <div className="bg-white rounded-2xl p-6 border border-[#E5E1DA] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="luxury-card rounded-3xl p-6 border-white/[0.08] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-widest text-[#8C8881]">
+          <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#E5C578]">
             Interactive Geographic Hub
           </span>
-          <h2 className="font-serif text-2xl font-light text-[#1A1A1A] flex items-center gap-2 mt-0.5">
-            <Compass className="w-5 h-5 text-[#1A1A1A]" />
+          <h2 className="font-serif text-2xl font-light text-white flex items-center gap-2 mt-0.5">
+            <Compass className="w-5 h-5 text-[#E5C578]" />
             Live Map & Transit Directions
           </h2>
-          <p className="text-xs text-[#8C8881] mt-0.5">
-            Real interactive maps with Google Maps turn-by-turn routing for {trip.title}.
+          <p className="text-xs text-stone-400 mt-0.5">
+            Turn-by-turn routing and Google Maps integration for {trip.title}.
           </p>
         </div>
 
@@ -277,33 +276,33 @@ export const MapView: React.FC<MapViewProps> = ({ trip }) => {
         <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={handleOpenEntireTripInGoogleMaps}
-            className="px-3 py-1.5 rounded-xl bg-[#FDFCFB] hover:bg-stone-100 border border-[#E5E1DA] text-xs font-semibold text-[#1A1A1A] flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+            className="px-4 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-xs font-semibold text-white flex items-center gap-1.5 transition-colors cursor-pointer"
           >
-            <Navigation className="w-3.5 h-3.5 text-blue-600" />
+            <Navigation className="w-3.5 h-3.5 text-[#E5C578]" />
             <span>Google Maps Route</span>
           </button>
 
           {/* Day Filter Pills */}
-          <div className="flex items-center gap-1 bg-[#FDFCFB] p-1 rounded-xl border border-[#E5E1DA] overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-1 bg-white/[0.02] p-1 rounded-xl border border-white/[0.08] overflow-x-auto no-scrollbar">
             <button
               onClick={() => setSelectedDayId('all')}
-              className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
+              className={`px-3 py-1 rounded-lg text-[10px] font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
                 selectedDayId === 'all'
-                  ? 'bg-[#1A1A1A] text-white shadow-xs'
-                  : 'text-[#8C8881] hover:text-[#1A1A1A]'
+                  ? 'bg-white text-black shadow-sm'
+                  : 'text-stone-400 hover:text-white'
               }`}
             >
               All ({allStops.length})
             </button>
 
-            {trip.days.map((day) => (
+            {(trip.days || []).map((day) => (
               <button
                 key={day.id}
                 onClick={() => setSelectedDayId(day.id)}
-                className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider whitespace-nowrap transition-all cursor-pointer ${
+                className={`px-3 py-1 rounded-lg text-[10px] font-mono font-bold uppercase tracking-wider whitespace-nowrap transition-all cursor-pointer ${
                   selectedDayId === day.id
-                    ? 'bg-[#1A1A1A] text-white shadow-xs'
-                    : 'text-[#8C8881] hover:text-[#1A1A1A]'
+                    ? 'bg-white text-black shadow-sm'
+                    : 'text-stone-400 hover:text-white'
                 }`}
               >
                 Day {day.dayNumber}
@@ -317,31 +316,31 @@ export const MapView: React.FC<MapViewProps> = ({ trip }) => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Interactive Leaflet Map View (2 Columns) */}
-        <div className="lg:col-span-2 bg-[#FDFCFB] rounded-2xl border border-[#E5E1DA] relative overflow-hidden shadow-xs flex flex-col h-[480px] sm:h-[560px]">
+        <div className="lg:col-span-2 luxury-card rounded-3xl border-white/[0.08] relative overflow-hidden shadow-2xl flex flex-col h-[480px] sm:h-[560px]">
           
           {/* Map Layer Switcher Floating Controls */}
           <div className="absolute top-4 left-4 z-[400] flex items-center gap-2">
-            <div className="bg-white/95 backdrop-blur-md p-1 rounded-xl border border-[#E5E1DA] shadow-sm flex items-center gap-1 text-[11px] font-medium">
+            <div className="bg-[#090A0E]/90 backdrop-blur-md p-1 rounded-2xl border border-white/10 shadow-lg flex items-center gap-1 text-[11px] font-medium font-mono">
               <button
                 onClick={() => setMapStyle('clean')}
-                className={`px-2.5 py-1 rounded-lg transition-colors cursor-pointer ${
-                  mapStyle === 'clean' ? 'bg-[#1A1A1A] text-white' : 'text-[#8C8881] hover:text-[#1A1A1A]'
+                className={`px-2.5 py-1 rounded-xl transition-colors cursor-pointer ${
+                  mapStyle === 'clean' ? 'bg-[#E5C578] text-black font-bold' : 'text-stone-400 hover:text-white'
                 }`}
               >
-                Clean Voyager
+                Voyager
               </button>
               <button
                 onClick={() => setMapStyle('streets')}
-                className={`px-2.5 py-1 rounded-lg transition-colors cursor-pointer ${
-                  mapStyle === 'streets' ? 'bg-[#1A1A1A] text-white' : 'text-[#8C8881] hover:text-[#1A1A1A]'
+                className={`px-2.5 py-1 rounded-xl transition-colors cursor-pointer ${
+                  mapStyle === 'streets' ? 'bg-[#E5C578] text-black font-bold' : 'text-stone-400 hover:text-white'
                 }`}
               >
                 Streets
               </button>
               <button
                 onClick={() => setMapStyle('satellite')}
-                className={`px-2.5 py-1 rounded-lg transition-colors cursor-pointer ${
-                  mapStyle === 'satellite' ? 'bg-[#1A1A1A] text-white' : 'text-[#8C8881] hover:text-[#1A1A1A]'
+                className={`px-2.5 py-1 rounded-xl transition-colors cursor-pointer ${
+                  mapStyle === 'satellite' ? 'bg-[#E5C578] text-black font-bold' : 'text-stone-400 hover:text-white'
                 }`}
               >
                 Satellite
@@ -353,13 +352,13 @@ export const MapView: React.FC<MapViewProps> = ({ trip }) => {
           <div className="absolute top-4 right-4 z-[400] flex flex-col gap-1.5">
             <button
               onClick={handleZoomIn}
-              className="w-8 h-8 rounded-xl bg-white/95 border border-[#E5E1DA] text-[#1A1A1A] flex items-center justify-center hover:bg-stone-50 shadow-sm cursor-pointer"
+              className="w-8 h-8 rounded-xl bg-[#090A0E]/90 border border-white/10 text-white flex items-center justify-center hover:bg-white/10 shadow-lg cursor-pointer"
             >
               <ZoomIn className="w-4 h-4" />
             </button>
             <button
               onClick={handleZoomOut}
-              className="w-8 h-8 rounded-xl bg-white/95 border border-[#E5E1DA] text-[#1A1A1A] flex items-center justify-center hover:bg-stone-50 shadow-sm cursor-pointer"
+              className="w-8 h-8 rounded-xl bg-[#090A0E]/90 border border-white/10 text-white flex items-center justify-center hover:bg-white/10 shadow-lg cursor-pointer"
             >
               <ZoomOut className="w-4 h-4" />
             </button>
@@ -369,19 +368,19 @@ export const MapView: React.FC<MapViewProps> = ({ trip }) => {
           <div ref={mapContainerRef} className="w-full h-full z-0" />
 
           {/* Bottom Overlay Legend */}
-          <div className="absolute bottom-3 left-3 right-3 z-[400] flex items-center justify-between bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-xl border border-[#E5E1DA] text-xs text-[#8C8881] shadow-xs">
+          <div className="absolute bottom-3 left-3 right-3 z-[400] flex items-center justify-between bg-[#090A0E]/90 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-white/10 text-xs text-stone-400 shadow-xl">
             <div className="flex items-center gap-3">
-              <span className="flex items-center gap-1.5 text-[11px] font-medium text-[#1A1A1A]">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#1A1A1A]" />
+              <span className="flex items-center gap-1.5 text-[11px] font-medium text-white">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#E5C578]" />
                 <span>{filteredStops.length} Plotted Stops</span>
               </span>
-              <span className="text-[11px] hidden sm:inline text-[#8C8881]">
+              <span className="text-[11px] hidden sm:inline text-stone-400">
                 Tap pins to inspect and navigate
               </span>
             </div>
 
-            <span className="text-[10px] font-mono font-bold text-emerald-700 uppercase bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-              Live Routing
+            <span className="text-[10px] font-mono font-bold text-emerald-400 uppercase bg-emerald-500/10 px-2 py-0.5 rounded-lg border border-emerald-500/20">
+              Live Transit Mode
             </span>
           </div>
 
@@ -389,84 +388,90 @@ export const MapView: React.FC<MapViewProps> = ({ trip }) => {
 
         {/* Right Sidebar: Sequenced Stops Feed (1 Column) */}
         <div className="space-y-2.5 max-h-[560px] overflow-y-auto pr-1">
-          <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-[#8C8881] px-1">
+          <div className="flex items-center justify-between text-[10px] font-mono font-bold uppercase tracking-widest text-stone-400 px-1">
             <span>Sequenced Stops ({filteredStops.length})</span>
             <span>Est. Cost</span>
           </div>
 
-          {filteredStops.map((stop) => {
-            const isActive = activeStopId === stop.activity.id;
-            const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-              `${stop.activity.name}, ${stop.activity.location || trip.destinations[0]?.city}`
-            )}`;
+          {filteredStops.length === 0 ? (
+            <div className="luxury-card rounded-2xl p-8 text-center text-stone-500 text-xs">
+              No itinerary stops added to this trip yet.
+            </div>
+          ) : (
+            filteredStops.map((stop) => {
+              const isActive = activeStopId === stop.activity.id;
+              const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                `${stop.activity.name}, ${stop.activity.location || trip.destinations[0]?.city}`
+              )}`;
 
-            return (
-              <div
-                key={stop.activity.id}
-                onClick={() => handleFocusStop(stop)}
-                className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
-                  isActive
-                    ? 'bg-white border-[#1A1A1A] shadow-xs ring-1 ring-[#1A1A1A]'
-                    : 'bg-white border-[#E5E1DA] hover:border-[#1A1A1A]'
-                }`}
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-start gap-2.5">
-                    <span className="w-5 h-5 rounded-full bg-[#1A1A1A] text-white text-[10px] font-mono font-bold flex items-center justify-center shrink-0">
-                      {stop.stopIndex}
-                    </span>
+              return (
+                <div
+                  key={stop.activity.id}
+                  onClick={() => handleFocusStop(stop)}
+                  className={`p-4 rounded-2xl border transition-all cursor-pointer ${
+                    isActive
+                      ? 'luxury-card-elevated border-[#E5C578] shadow-lg'
+                      : 'luxury-card border-white/[0.08] hover:border-white/20'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-start gap-3">
+                      <span className="w-6 h-6 rounded-xl bg-white/10 text-[#E5C578] text-[10px] font-mono font-bold flex items-center justify-center shrink-0 border border-white/10">
+                        {stop.stopIndex}
+                      </span>
 
-                    <div className="space-y-0.5">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[9px] font-mono uppercase font-bold text-[#8C8881]">
-                          Day {stop.day.dayNumber} • {stop.activity.time || stop.activity.timeBlock}
-                        </span>
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[9px] font-mono uppercase font-bold text-[#E5C578]">
+                            Day {stop.day.dayNumber} • {stop.activity.time || stop.activity.timeBlock}
+                          </span>
+                        </div>
+
+                        <h4 className="font-serif text-sm font-normal text-white leading-snug">
+                          {stop.activity.name}
+                        </h4>
+
+                        {stop.activity.location && (
+                          <p className="text-[11px] text-stone-400 flex items-center gap-1">
+                            <MapPin className="w-3 h-3 text-stone-500" />
+                            {stop.activity.location}
+                          </p>
+                        )}
                       </div>
+                    </div>
 
-                      <h4 className="font-serif text-sm font-light text-[#1A1A1A] leading-snug">
-                        {stop.activity.name}
-                      </h4>
-
-                      {stop.activity.location && (
-                        <p className="text-[11px] text-[#8C8881] flex items-center gap-1">
-                          <MapPin className="w-3 h-3 text-[#8C8881]" />
-                          {stop.activity.location}
-                        </p>
+                    <div className="text-right shrink-0">
+                      {stop.activity.estCost > 0 && (
+                        <span className="text-[10px] font-mono font-bold text-[#E5C578] bg-white/[0.04] px-2 py-0.5 rounded-lg border border-white/10">
+                          {formatCurrency(stop.activity.estCost, baseCurrency)}
+                        </span>
                       )}
                     </div>
                   </div>
 
-                  <div className="text-right shrink-0">
-                    {stop.activity.estCost > 0 && (
-                      <span className="text-[10px] font-mono font-bold text-[#1A1A1A] bg-[#FDFCFB] px-1.5 py-0.5 rounded border border-[#E5E1DA]">
-                        {formatCurrency(stop.activity.estCost, baseCurrency)}
+                  {/* Turn-by-turn google maps & travel time */}
+                  <div className="mt-3 pt-2.5 border-t border-white/[0.08] flex items-center justify-between text-[10px] text-stone-400">
+                    <a
+                      href={googleMapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="inline-flex items-center gap-1 text-[#E5C578] hover:underline font-mono"
+                    >
+                      <ExternalLink className="w-3 h-3" />
+                      Google Maps ↗
+                    </a>
+
+                    {stop.activity.travelTimeToNext && (
+                      <span className="font-mono text-[9px] text-stone-300 bg-white/[0.04] px-2 py-0.5 rounded-lg border border-white/10">
+                        {stop.activity.travelTimeToNext} ({stop.activity.distanceToNext || '1.0 km'})
                       </span>
                     )}
                   </div>
                 </div>
-
-                {/* Turn-by-turn google maps & travel time */}
-                <div className="mt-2.5 pt-2 border-t border-[#E5E1DA] flex items-center justify-between text-[10px] text-[#8C8881]">
-                  <a
-                    href={googleMapsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    className="inline-flex items-center gap-1 text-blue-600 hover:underline font-semibold"
-                  >
-                    <ExternalLink className="w-3 h-3" />
-                    Open in Google Maps
-                  </a>
-
-                  {stop.activity.travelTimeToNext && (
-                    <span className="font-mono text-[9px] text-[#1A1A1A] bg-[#FDFCFB] px-1.5 py-0.5 rounded border border-[#E5E1DA]">
-                      {stop.activity.travelTimeToNext} ({stop.activity.distanceToNext || '1.0 km'})
-                    </span>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
 
       </div>

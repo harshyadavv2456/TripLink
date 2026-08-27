@@ -20,15 +20,15 @@ import {
 } from 'lucide-react';
 
 const CATEGORY_ICONS: Record<ExpenseCategory, { label: string; icon: any; color: string; bg: string }> = {
-  flights: { label: 'Flights & Transit', icon: Plane, color: 'text-[#1A1A1A]', bg: 'bg-[#FDFCFB] border-[#E5E1DA]' },
-  stay: { label: 'Hotels & Lodging', icon: Building, color: 'text-[#1A1A1A]', bg: 'bg-[#FDFCFB] border-[#E5E1DA]' },
-  lodging: { label: 'Hotels & Lodging', icon: Building, color: 'text-[#1A1A1A]', bg: 'bg-[#FDFCFB] border-[#E5E1DA]' },
-  food: { label: 'Dining & Drinks', icon: Utensils, color: 'text-[#1A1A1A]', bg: 'bg-[#FDFCFB] border-[#E5E1DA]' },
-  activities: { label: 'Tours & Tickets', icon: Ticket, color: 'text-[#1A1A1A]', bg: 'bg-[#FDFCFB] border-[#E5E1DA]' },
-  transport: { label: 'Local Transit & Cabs', icon: Car, color: 'text-[#1A1A1A]', bg: 'bg-[#FDFCFB] border-[#E5E1DA]' },
-  transit: { label: 'Local Transit & Cabs', icon: Car, color: 'text-[#1A1A1A]', bg: 'bg-[#FDFCFB] border-[#E5E1DA]' },
-  shopping: { label: 'Shopping & Gifts', icon: ShoppingBag, color: 'text-[#1A1A1A]', bg: 'bg-[#FDFCFB] border-[#E5E1DA]' },
-  other: { label: 'Miscellaneous', icon: HelpCircle, color: 'text-[#1A1A1A]', bg: 'bg-[#FDFCFB] border-[#E5E1DA]' },
+  flights: { label: 'Flights & Transit', icon: Plane, color: 'text-[#E5C578]', bg: 'bg-white/[0.02] border-white/10' },
+  stay: { label: 'Hotels & Lodging', icon: Building, color: 'text-[#E5C578]', bg: 'bg-white/[0.02] border-white/10' },
+  lodging: { label: 'Hotels & Lodging', icon: Building, color: 'text-[#E5C578]', bg: 'bg-white/[0.02] border-white/10' },
+  food: { label: 'Dining & Drinks', icon: Utensils, color: 'text-[#E5C578]', bg: 'bg-white/[0.02] border-white/10' },
+  activities: { label: 'Tours & Tickets', icon: Ticket, color: 'text-[#E5C578]', bg: 'bg-white/[0.02] border-white/10' },
+  transport: { label: 'Local Transit & Cabs', icon: Car, color: 'text-[#E5C578]', bg: 'bg-white/[0.02] border-white/10' },
+  transit: { label: 'Local Transit & Cabs', icon: Car, color: 'text-[#E5C578]', bg: 'bg-white/[0.02] border-white/10' },
+  shopping: { label: 'Shopping & Gifts', icon: ShoppingBag, color: 'text-[#E5C578]', bg: 'bg-white/[0.02] border-white/10' },
+  other: { label: 'Miscellaneous', icon: HelpCircle, color: 'text-[#E5C578]', bg: 'bg-white/[0.02] border-white/10' },
 };
 
 interface BudgetTrackerProps {
@@ -54,7 +54,7 @@ export const BudgetTracker: React.FC<BudgetTrackerProps> = ({ trip: propTrip }) 
   // Single Trip spend calculations
   const totalSpent = useMemo(() => {
     if (!currentTrip) return 0;
-    return currentTrip.expenses.reduce((s, e) => s + Number(e.amount || 0), 0);
+    return (currentTrip.expenses || []).reduce((s, e) => s + Number(e.amount || 0), 0);
   }, [currentTrip]);
 
   const budget = currentTrip?.budget || 3000;
@@ -75,7 +75,7 @@ export const BudgetTracker: React.FC<BudgetTrackerProps> = ({ trip: propTrip }) 
       other: 0,
     };
     if (!currentTrip) return map;
-    currentTrip.expenses.forEach((e) => {
+    (currentTrip.expenses || []).forEach((e) => {
       map[e.category] = (map[e.category] || 0) + Number(e.amount || 0);
     });
     return map;
@@ -87,7 +87,7 @@ export const BudgetTracker: React.FC<BudgetTrackerProps> = ({ trip: propTrip }) 
 
     trips.forEach((t) => {
       const year = new Date(t.startDate).getFullYear().toString();
-      const tripSpend = t.expenses.reduce((s, e) => s + Number(e.amount || 0), 0);
+      const tripSpend = (t.expenses || []).reduce((s, e) => s + Number(e.amount || 0), 0);
 
       if (!yearMap[year]) {
         yearMap[year] = { year, total: 0, trips: [], avgPerDay: 0 };
@@ -99,7 +99,7 @@ export const BudgetTracker: React.FC<BudgetTrackerProps> = ({ trip: propTrip }) 
     const years = Object.keys(yearMap).sort();
     return years.map((y) => {
       const entry = yearMap[y];
-      const totalDays = entry.trips.reduce((s, t) => s + (t.days.length || 1), 0);
+      const totalDays = entry.trips.reduce((s, t) => s + ((t.days || []).length || 1), 0);
       return {
         ...entry,
         avgPerDay: totalDays > 0 ? Math.round(entry.total / totalDays) : 0,
@@ -132,23 +132,23 @@ export const BudgetTracker: React.FC<BudgetTrackerProps> = ({ trip: propTrip }) 
       {/* Header & Mode Switcher */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-widest text-[#8C8881]">
+          <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#E5C578]">
             Financial Cadence
           </span>
-          <h2 className="font-serif text-2xl sm:text-3xl font-light text-[#1A1A1A] flex items-center gap-2">
-            <DollarSign className="w-5 h-5 text-[#1A1A1A]" />
+          <h2 className="font-serif text-2xl sm:text-3xl font-light text-white flex items-center gap-2">
+            <DollarSign className="w-5 h-5 text-[#E5C578]" />
             Budget & Expense Tracking
           </h2>
         </div>
 
         {/* View Toggle */}
-        <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-[#E5E1DA]">
+        <div className="flex items-center gap-1 bg-white/[0.02] p-1 rounded-2xl border border-white/[0.08]">
           <button
             onClick={() => setViewMode('single-trip')}
-            className={`px-3.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer ${
+            className={`px-3.5 py-1.5 rounded-xl text-[10px] font-mono font-bold uppercase tracking-widest transition-all cursor-pointer ${
               viewMode === 'single-trip'
-                ? 'bg-[#1A1A1A] text-white shadow-xs'
-                : 'text-[#8C8881] hover:text-[#1A1A1A]'
+                ? 'bg-white text-black shadow-sm'
+                : 'text-stone-400 hover:text-white'
             }`}
           >
             {currentTrip?.title || 'Trip Budget'}
@@ -156,14 +156,14 @@ export const BudgetTracker: React.FC<BudgetTrackerProps> = ({ trip: propTrip }) 
 
           <button
             onClick={() => setViewMode('cross-trip-multiyear')}
-            className={`px-3.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-1.5 cursor-pointer ${
+            className={`px-3.5 py-1.5 rounded-xl text-[10px] font-mono font-bold uppercase tracking-widest transition-all flex items-center gap-1.5 cursor-pointer ${
               viewMode === 'cross-trip-multiyear'
-                ? 'bg-[#1A1A1A] text-white shadow-xs'
-                : 'text-[#8C8881] hover:text-[#1A1A1A]'
+                ? 'bg-white text-black shadow-sm'
+                : 'text-stone-400 hover:text-white'
             }`}
           >
-            <BarChart3 className="w-3 h-3 text-[#8C8881]" />
-            <span>Multi-Year Overview</span>
+            <BarChart3 className="w-3 h-3 text-[#E5C578]" />
+            <span>Multi-Year</span>
           </button>
         </div>
       </div>
@@ -173,15 +173,15 @@ export const BudgetTracker: React.FC<BudgetTrackerProps> = ({ trip: propTrip }) 
         <div className="space-y-6">
           
           {/* Main Budget Progress Card */}
-          <div className="bg-white rounded-2xl p-6 sm:p-8 border border-[#E5E1DA] shadow-xs space-y-6">
+          <div className="luxury-card rounded-3xl p-6 sm:p-8 border-white/[0.08] shadow-2xl space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-[#8C8881]">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#E5C578]">
                   Target Budget vs Realized Spend
                 </span>
-                <h3 className="font-serif text-3xl font-light text-[#1A1A1A]">
+                <h3 className="font-serif text-3xl font-light text-white font-mono">
                   {formatCurrency(totalSpent, baseCurrency)}{' '}
-                  <span className="text-base font-normal text-[#8C8881]">
+                  <span className="text-base font-normal text-stone-500 font-sans">
                     / {formatCurrency(budget, baseCurrency)}
                   </span>
                 </h3>
@@ -189,33 +189,33 @@ export const BudgetTracker: React.FC<BudgetTrackerProps> = ({ trip: propTrip }) 
 
               <div className="flex items-center gap-4">
                 <div className="text-right">
-                  <span className="text-[9px] text-[#8C8881] block uppercase font-bold tracking-widest">Remaining</span>
-                  <span className={`text-base font-mono font-bold ${remaining > 0 ? 'text-[#1A1A1A]' : 'text-rose-600'}`}>
+                  <span className="text-[9px] text-stone-400 block uppercase font-mono font-bold tracking-widest">Remaining</span>
+                  <span className={`text-base font-mono font-bold ${remaining > 0 ? 'text-[#E5C578]' : 'text-rose-400'}`}>
                     {formatCurrency(remaining, baseCurrency)}
                   </span>
                 </div>
 
                 <button
                   onClick={() => setShowAddModal(true)}
-                  className="px-4 py-2.5 rounded-xl bg-[#1A1A1A] hover:bg-black text-white text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 shadow-xs cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#E5C578] to-[#C59B27] text-[#090A0E] text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-lg shadow-[#D4AF37]/20 btn-tactile cursor-pointer"
                 >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>+ Log Expense</span>
+                  <Plus className="w-3.5 h-3.5 text-[#090A0E] stroke-[2.5]" />
+                  <span>Log Expense</span>
                 </button>
               </div>
             </div>
 
             {/* Progress Bar */}
             <div className="space-y-1.5">
-              <div className="w-full bg-[#FDFCFB] h-3 rounded-full overflow-hidden border border-[#E5E1DA]">
+              <div className="w-full bg-white/[0.04] h-3 rounded-full overflow-hidden border border-white/[0.08]">
                 <div
                   className={`h-full rounded-full transition-all duration-500 ${
-                    percentUsed > 90 ? 'bg-rose-500' : 'bg-[#1A1A1A]'
+                    percentUsed > 90 ? 'bg-rose-500' : 'bg-gradient-to-r from-[#D4AF37] to-[#E5C578]'
                   }`}
                   style={{ width: `${percentUsed}%` }}
                 />
               </div>
-              <div className="flex justify-between text-[10px] font-mono text-[#8C8881]">
+              <div className="flex justify-between text-[10px] font-mono text-stone-400">
                 <span>{percentUsed}% of budget committed</span>
                 <span>{formatCurrency(remaining, baseCurrency)} remaining</span>
               </div>
@@ -239,15 +239,15 @@ export const BudgetTracker: React.FC<BudgetTrackerProps> = ({ trip: propTrip }) 
               return (
                 <div
                   key={cat}
-                  className="bg-white p-4 rounded-xl border border-[#E5E1DA] shadow-xs space-y-2"
+                  className="luxury-card p-4 rounded-2xl border-white/[0.08] space-y-2"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-[9px] uppercase font-bold text-[#8C8881] tracking-wider">
+                    <span className="text-[9px] uppercase font-mono font-bold text-stone-400 tracking-wider">
                       {label}
                     </span>
-                    <Icon className="w-3.5 h-3.5 text-[#8C8881]" />
+                    <Icon className="w-3.5 h-3.5 text-[#E5C578]" />
                   </div>
-                  <div className="font-mono text-sm font-bold text-[#1A1A1A]">
+                  <div className="font-mono text-sm font-bold text-white">
                     {formatCurrency(amount, baseCurrency)}
                   </div>
                 </div>
@@ -256,47 +256,47 @@ export const BudgetTracker: React.FC<BudgetTrackerProps> = ({ trip: propTrip }) 
           </div>
 
           {/* Expenses Table */}
-          <div className="bg-white rounded-2xl border border-[#E5E1DA] shadow-xs overflow-hidden">
-            <div className="p-4 sm:p-6 border-b border-[#E5E1DA] flex items-center justify-between">
-              <h4 className="font-serif text-lg font-light text-[#1A1A1A]">
+          <div className="luxury-card rounded-3xl border-white/[0.08] overflow-hidden">
+            <div className="p-4 sm:p-6 border-b border-white/[0.08] flex items-center justify-between">
+              <h4 className="font-serif text-lg font-light text-white">
                 Recent Itemized Expenses
               </h4>
-              <span className="text-xs text-[#8C8881] font-mono">
-                {currentTrip.expenses.length} records
+              <span className="text-xs text-stone-400 font-mono">
+                {(currentTrip.expenses || []).length} records
               </span>
             </div>
 
-            <div className="divide-y divide-[#E5E1DA]">
-              {currentTrip.expenses.map((exp) => {
+            <div className="divide-y divide-white/[0.08]">
+              {(currentTrip.expenses || []).map((exp) => {
                 const cfg = CATEGORY_ICONS[exp.category] || CATEGORY_ICONS.other;
                 const Icon = cfg.icon;
 
                 return (
                   <div
                     key={exp.id}
-                    className="p-4 flex items-center justify-between gap-4 hover:bg-[#FDFCFB] transition-colors"
+                    className="p-4 flex items-center justify-between gap-4 hover:bg-white/[0.02] transition-colors"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-xl border border-[#E5E1DA] bg-white text-[#1A1A1A]">
+                      <div className="p-2 rounded-xl border border-white/10 bg-white/[0.02] text-[#E5C578]">
                         <Icon className="w-4 h-4" />
                       </div>
                       <div>
-                        <h5 className="font-medium text-xs text-[#1A1A1A]">
+                        <h5 className="font-medium text-xs text-white">
                           {exp.description}
                         </h5>
-                        <span className="text-[10px] text-[#8C8881]">
+                        <span className="text-[10px] text-stone-400 font-mono">
                           {exp.date} • {cfg.label} {exp.paidBy ? `• Paid by ${exp.paidBy}` : ''}
                         </span>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-4">
-                      <span className="font-mono text-xs font-bold text-[#1A1A1A]">
+                      <span className="font-mono text-xs font-bold text-[#E5C578]">
                         {formatCurrency(exp.amount, baseCurrency)}
                       </span>
                       <button
                         onClick={() => deleteExpense(currentTrip.id, exp.id)}
-                        className="p-1 text-[#8C8881] hover:text-rose-600 rounded-md transition-colors cursor-pointer"
+                        className="p-1 text-stone-500 hover:text-rose-400 rounded-md transition-colors cursor-pointer"
                         title="Delete expense"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -306,10 +306,10 @@ export const BudgetTracker: React.FC<BudgetTrackerProps> = ({ trip: propTrip }) 
                 );
               })}
 
-              {currentTrip.expenses.length === 0 && (
-                <div className="p-8 text-center text-xs text-[#8C8881] space-y-1">
+              {(currentTrip.expenses || []).length === 0 && (
+                <div className="p-8 text-center text-xs text-stone-500 space-y-1">
                   <p>No expenses logged for this trip yet.</p>
-                  <p className="text-[11px]">Click "+ Log Expense" or scan booking screenshots to auto-sync.</p>
+                  <p className="text-[11px]">Click "Log Expense" to begin tracking costs.</p>
                 </div>
               )}
             </div>
@@ -321,57 +321,61 @@ export const BudgetTracker: React.FC<BudgetTrackerProps> = ({ trip: propTrip }) 
       {/* VIEW 2: MULTI-YEAR CROSS-TRIP OVERVIEW */}
       {viewMode === 'cross-trip-multiyear' && (
         <div className="space-y-6">
-          <div className="bg-white rounded-2xl p-6 sm:p-8 border border-[#E5E1DA] shadow-xs space-y-6">
+          <div className="luxury-card rounded-3xl p-6 sm:p-8 border-white/[0.08] space-y-6">
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#8C8881]">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#E5C578]">
                 Connected Multi-Trip Analytics
               </span>
-              <h3 className="font-serif text-2xl font-light text-[#1A1A1A]">
+              <h3 className="font-serif text-2xl font-light text-white">
                 Historical Spend per Year
               </h3>
             </div>
 
-            <div className="space-y-4">
-              {multiYearData.map((data) => {
-                const percentOfMax = Math.round((data.total / maxYearSpend) * 100);
+            {multiYearData.length === 0 ? (
+              <p className="text-xs text-stone-500 italic py-4">No expense records across any trips yet.</p>
+            ) : (
+              <div className="space-y-4">
+                {multiYearData.map((data) => {
+                  const percentOfMax = Math.round((data.total / maxYearSpend) * 100);
 
-                return (
-                  <div key={data.year} className="space-y-1.5">
-                    <div className="flex justify-between text-xs font-semibold">
-                      <span className="text-[#1A1A1A] font-mono">{data.year}</span>
-                      <span className="text-[#1A1A1A] font-mono font-bold">
-                        {formatCurrency(data.total, baseCurrency)}{' '}
-                        <span className="text-[#8C8881] font-normal text-[10px]">
-                          ({data.trips.length} journeys)
+                  return (
+                    <div key={data.year} className="space-y-1.5">
+                      <div className="flex justify-between text-xs font-semibold">
+                        <span className="text-white font-mono">{data.year}</span>
+                        <span className="text-[#E5C578] font-mono font-bold">
+                          {formatCurrency(data.total, baseCurrency)}{' '}
+                          <span className="text-stone-400 font-normal text-[10px]">
+                            ({data.trips.length} journeys)
+                          </span>
                         </span>
-                      </span>
-                    </div>
+                      </div>
 
-                    <div className="w-full bg-[#FDFCFB] h-3 rounded-full overflow-hidden border border-[#E5E1DA]">
-                      <div
-                        className="bg-[#1A1A1A] h-full rounded-full transition-all duration-500"
-                        style={{ width: `${percentOfMax}%` }}
-                      />
+                      <div className="w-full bg-white/[0.04] h-3 rounded-full overflow-hidden border border-white/[0.08]">
+                        <div
+                          className="bg-gradient-to-r from-[#D4AF37] to-[#E5C578] h-full rounded-full transition-all duration-500"
+                          style={{ width: `${percentOfMax}%` }}
+                        />
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       )}
 
       {/* Modal: Add Expense */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl max-w-md w-full border border-[#E5E1DA] shadow-xl overflow-hidden">
-            <div className="p-5 border-b border-[#E5E1DA] flex items-center justify-between bg-[#FDFCFB]">
-              <h3 className="font-serif text-lg font-medium text-[#1A1A1A]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="luxury-card-elevated rounded-3xl max-w-md w-full border-white/20 shadow-2xl overflow-hidden">
+            <div className="p-5 border-b border-white/[0.08] flex items-center justify-between bg-[#0D0F15]">
+              <h3 className="font-serif text-lg font-medium text-white">
                 Log Trip Expense
               </h3>
               <button
                 onClick={() => setShowAddModal(false)}
-                className="p-1.5 text-[#8C8881] hover:text-[#1A1A1A] rounded-lg hover:bg-stone-100 cursor-pointer"
+                className="p-1.5 text-stone-400 hover:text-white rounded-lg hover:bg-white/10 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -379,7 +383,7 @@ export const BudgetTracker: React.FC<BudgetTrackerProps> = ({ trip: propTrip }) 
 
             <form onSubmit={handleCreateExpense} className="p-6 space-y-4">
               <div>
-                <label className="text-[10px] font-mono uppercase font-bold text-[#8C8881] mb-1 block">
+                <label className="text-[10px] font-mono uppercase font-bold text-stone-400 mb-1 block">
                   Description
                 </label>
                 <input
@@ -388,13 +392,13 @@ export const BudgetTracker: React.FC<BudgetTrackerProps> = ({ trip: propTrip }) 
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="e.g. Michelin Ramen Dinner"
-                  className="w-full px-3 py-2 rounded-xl border border-[#E5E1DA] text-xs focus:outline-none focus:border-[#1A1A1A]"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#0D0F15] border border-white/10 text-xs text-white placeholder:text-stone-500 focus:outline-none focus:border-[#E5C578]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[10px] font-mono uppercase font-bold text-[#8C8881] mb-1 block">
+                  <label className="text-[10px] font-mono uppercase font-bold text-stone-400 mb-1 block">
                     Amount ({currencyConfig.code})
                   </label>
                   <input
@@ -403,18 +407,18 @@ export const BudgetTracker: React.FC<BudgetTrackerProps> = ({ trip: propTrip }) 
                     required
                     value={amount}
                     onChange={(e) => setAmount(Number(e.target.value))}
-                    className="w-full px-3 py-2 rounded-xl border border-[#E5E1DA] text-xs font-mono focus:outline-none focus:border-[#1A1A1A]"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#0D0F15] border border-white/10 text-xs text-white font-mono focus:outline-none focus:border-[#E5C578]"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-mono uppercase font-bold text-[#8C8881] mb-1 block">
+                  <label className="text-[10px] font-mono uppercase font-bold text-stone-400 mb-1 block">
                     Category
                   </label>
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value as ExpenseCategory)}
-                    className="w-full px-3 py-2 rounded-xl border border-[#E5E1DA] text-xs focus:outline-none focus:border-[#1A1A1A] bg-white"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#0D0F15] border border-white/10 text-xs text-white focus:outline-none focus:border-[#E5C578]"
                   >
                     <option value="food">Food & Dining</option>
                     <option value="stay">Lodging</option>
@@ -427,17 +431,17 @@ export const BudgetTracker: React.FC<BudgetTrackerProps> = ({ trip: propTrip }) 
                 </div>
               </div>
 
-              <div className="pt-2 flex justify-end gap-2">
+              <div className="pt-2 flex justify-end gap-2.5">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 rounded-xl border border-[#E5E1DA] text-xs font-semibold cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl border border-white/10 text-stone-400 text-xs font-semibold cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-[#1A1A1A] text-white text-xs font-semibold cursor-pointer"
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#D4AF37] via-[#E5C578] to-[#C59B27] text-[#090A0E] text-xs font-bold uppercase tracking-wider cursor-pointer"
                 >
                   Save Expense
                 </button>

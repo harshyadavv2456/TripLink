@@ -1,20 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTrip } from '../context/TripContext';
 import { SUPPORTED_CURRENCIES, formatCurrency, getCurrencyConfig } from '../data/currencies';
 import { GoogleAuthModal } from './GoogleAuthModal';
 import { ApkInstallModal } from './ApkInstallModal';
+import { OfflineManagerModal } from './OfflineManagerModal';
+import { LiveCurrencyConverterModal } from './LiveCurrencyConverterModal';
 import {
-  Compass,
   Plus,
-  BookmarkCheck,
-  BarChart3,
-  Luggage,
-  Sparkles,
-  Plane,
   Smartphone,
-  HardDrive,
-  Globe,
   ChevronDown,
+  Compass,
+  Luggage,
+  MapPin,
+  TrendingUp,
+  Database,
+  ArrowRightLeft,
+  Wifi,
+  WifiOff,
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
@@ -30,68 +32,70 @@ export const Navbar: React.FC = () => {
 
   const [showGoogleModal, setShowGoogleModal] = useState<boolean>(false);
   const [showApkModal, setShowApkModal] = useState<boolean>(false);
+  const [showOfflineModal, setShowOfflineModal] = useState<boolean>(false);
+  const [showForexModal, setShowForexModal] = useState<boolean>(false);
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState<boolean>(false);
+  const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
 
-  // Cross-trip stats calculation
-  const totalVisitedPlaces = user.visitedPlaces.length;
-  const uniqueCountries = new Set<string>();
-  const uniqueCities = new Set<string>();
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
-  user.visitedPlaces.forEach((p) => {
-    if (p.country) uniqueCountries.add(p.country.toLowerCase());
-    if (p.city) uniqueCities.add(p.city.toLowerCase());
-  });
-
-  trips.forEach((t) => {
-    t.destinations.forEach((d) => {
-      if (t.status === 'completed' || t.status === 'active') {
-        if (d.country) uniqueCountries.add(d.country.toLowerCase());
-        if (d.city) uniqueCities.add(d.city.toLowerCase());
-      }
-    });
-  });
-
-  const lifetimeSpendUSD = trips.reduce((sum, t) => {
-    const tripExpenses = t.expenses.reduce((s, e) => s + Number(e.amount || 0), 0);
-    return sum + tripExpenses;
-  }, 0);
-
+  // Stats calculation
+  const totalVisitedPlaces = user.visitedPlaces?.length || 0;
   const currentCurrency = getCurrencyConfig(baseCurrency);
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-[#FDFCFB]/95 backdrop-blur-md border-b border-[#E5E1DA] transition-all">
+      <header className="sticky top-0 z-40 bg-[#0C0E14] border-b border-zinc-800 transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-18 sm:h-20">
+          <div className="flex items-center justify-between h-16 sm:h-18">
             
-            {/* Brand & Connected Tagline */}
-            <div className="flex items-center gap-6">
+            {/* Brand Logo */}
+            <div className="flex items-center gap-6 lg:gap-8">
               <button
                 onClick={() => {
                   setActiveTripId(null);
                   setActiveScreen('dashboard');
                 }}
-                className="flex items-center gap-3 text-left group transition-transform active:scale-98 cursor-pointer"
+                className="flex items-center gap-2.5 text-left group transition-transform active:scale-98 cursor-pointer"
               >
-                <h1 className="font-serif text-2xl sm:text-3xl font-light italic tracking-tight text-[#1A1A1A] hover:opacity-80 transition-opacity">
-                  TripLink
-                </h1>
+                <div className="w-8 h-8 rounded-xl bg-amber-500 text-zinc-950 flex items-center justify-center font-bold">
+                  <Compass className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-lg tracking-tight text-white group-hover:text-amber-400 transition-colors">
+                      TripLink
+                    </span>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 border border-zinc-700 text-zinc-300 font-mono font-medium">
+                      v2.0
+                    </span>
+                  </div>
+                </div>
               </button>
 
-              {/* Desktop Navigation Links */}
-              <nav className="hidden md:flex items-center gap-6 text-[11px] font-semibold uppercase tracking-[0.15em] text-[#8C8881]">
+              {/* Desktop Navigation Tabs */}
+              <nav className="hidden md:flex items-center gap-1 bg-zinc-900/90 p-1 rounded-xl border border-zinc-800">
                 <button
                   onClick={() => {
                     setActiveTripId(null);
                     setActiveScreen('dashboard');
                   }}
-                  className={`transition-colors pb-1 cursor-pointer ${
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all cursor-pointer ${
                     activeScreen === 'dashboard'
-                      ? 'text-[#1A1A1A] border-b-2 border-[#1A1A1A] font-bold'
-                      : 'hover:text-[#1A1A1A]'
+                      ? 'bg-zinc-800 text-white shadow-sm'
+                      : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
                   }`}
                 >
-                  Dashboard
+                  Trips
                 </button>
 
                 <button
@@ -99,16 +103,18 @@ export const Navbar: React.FC = () => {
                     setActiveTripId(null);
                     setActiveScreen('visited-memory-hub');
                   }}
-                  className={`transition-colors pb-1 flex items-center gap-1.5 cursor-pointer ${
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all flex items-center gap-1.5 cursor-pointer ${
                     activeScreen === 'visited-memory-hub'
-                      ? 'text-[#1A1A1A] border-b-2 border-[#1A1A1A] font-bold'
-                      : 'hover:text-[#1A1A1A]'
+                      ? 'bg-zinc-800 text-white shadow-sm'
+                      : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
                   }`}
                 >
-                  <span>Visited Memory</span>
-                  <span className="text-[10px] font-mono font-normal opacity-75">
-                    ({totalVisitedPlaces})
-                  </span>
+                  <span>Memory Vault</span>
+                  {totalVisitedPlaces > 0 && (
+                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-400 font-mono font-bold">
+                      {totalVisitedPlaces}
+                    </span>
+                  )}
                 </button>
 
                 <button
@@ -116,13 +122,14 @@ export const Navbar: React.FC = () => {
                     setActiveTripId(null);
                     setActiveScreen('cross-trip-analytics');
                   }}
-                  className={`transition-colors pb-1 cursor-pointer ${
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all flex items-center gap-1 cursor-pointer ${
                     activeScreen === 'cross-trip-analytics'
-                      ? 'text-[#1A1A1A] border-b-2 border-[#1A1A1A] font-bold'
-                      : 'hover:text-[#1A1A1A]'
+                      ? 'bg-zinc-800 text-white shadow-sm'
+                      : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
                   }`}
                 >
-                  Global Spend & Stats
+                  <TrendingUp className="w-3.5 h-3.5 text-zinc-400" />
+                  <span>Analytics</span>
                 </button>
 
                 <button
@@ -130,94 +137,81 @@ export const Navbar: React.FC = () => {
                     setActiveTripId(null);
                     setActiveScreen('packing-templates');
                   }}
-                  className={`transition-colors pb-1 cursor-pointer ${
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all flex items-center gap-1 cursor-pointer ${
                     activeScreen === 'packing-templates'
-                      ? 'text-[#1A1A1A] border-b-2 border-[#1A1A1A] font-bold'
-                      : 'hover:text-[#1A1A1A]'
+                      ? 'bg-zinc-800 text-white shadow-sm'
+                      : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
                   }`}
                 >
-                  Library
+                  <Luggage className="w-3.5 h-3.5 text-zinc-400" />
+                  <span>Packing Library</span>
                 </button>
               </nav>
             </div>
 
-            {/* Right Actions: Currency, Install APK, Google Account */}
+            {/* Right Quick Controls */}
             <div className="flex items-center gap-2 sm:gap-3">
               
-              {/* Currency Selector Dropdown */}
-              <div className="relative">
-                <button
-                  onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)}
-                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-[#E5E1DA] bg-white hover:border-[#1A1A1A] text-xs font-mono font-bold text-[#1A1A1A] transition-colors cursor-pointer shadow-2xs"
-                  title="Change Base Currency"
-                >
-                  <span>{currentCurrency.code}</span>
-                  <span className="text-[#8C8881]">({currentCurrency.symbol})</span>
-                  <ChevronDown className="w-3 h-3 text-[#8C8881]" />
-                </button>
-
-                {showCurrencyDropdown && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-2xl border border-[#E5E1DA] shadow-xl py-2 z-50 animate-in fade-in zoom-in-95 duration-150 max-h-64 overflow-y-auto">
-                    <div className="px-3 py-1 text-[9px] font-mono font-bold uppercase text-[#8C8881] border-b border-[#E5E1DA]">
-                      Select Base Currency
-                    </div>
-                    {SUPPORTED_CURRENCIES.map((curr) => (
-                      <button
-                        key={curr.code}
-                        onClick={() => {
-                          setBaseCurrency(curr.code);
-                          setShowCurrencyDropdown(false);
-                        }}
-                        className={`w-full px-3 py-2 text-left text-xs flex items-center justify-between hover:bg-[#FDFCFB] transition-colors cursor-pointer ${
-                          curr.code === baseCurrency ? 'font-bold text-[#1A1A1A] bg-stone-50' : 'text-[#8C8881]'
-                        }`}
-                      >
-                        <span>{curr.name}</span>
-                        <span className="font-mono font-bold">{curr.symbol} {curr.code}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Install App / Roll out APK button */}
+              {/* Offline Cache Status Pill */}
               <button
-                onClick={() => setShowApkModal(true)}
-                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FDFCFB] hover:bg-stone-100 border border-[#E5E1DA] text-xs font-semibold text-[#1A1A1A] transition-colors cursor-pointer shadow-2xs"
-                title="Roll out mobile app / APK"
+                onClick={() => setShowOfflineModal(true)}
+                className={`hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold transition-colors cursor-pointer ${
+                  isOnline
+                    ? 'bg-zinc-900 border-zinc-800 text-zinc-300 hover:border-zinc-700 hover:text-white'
+                    : 'bg-amber-950/40 border-amber-800 text-amber-400'
+                }`}
+                title="IndexedDB Offline Storage Status"
               >
-                <Smartphone className="w-3.5 h-3.5 text-[#1A1A1A]" />
-                <span className="text-[11px]">Install App</span>
+                {isOnline ? (
+                  <Wifi className="w-3.5 h-3.5 text-emerald-400" />
+                ) : (
+                  <WifiOff className="w-3.5 h-3.5 text-amber-400" />
+                )}
+                <span className="text-[11px] font-mono">
+                  {isOnline ? 'Offline Ready' : 'Offline Mode'}
+                </span>
               </button>
 
-              {/* Minimalist Lifetime Footprint Pill */}
-              <div className="hidden lg:flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#8C8881] border border-[#E5E1DA] bg-white px-3 py-1.5 rounded-full">
-                <span>{uniqueCountries.size} Countries</span>
-                <span className="text-[#E5E1DA]">•</span>
-                <span className="text-[#1A1A1A] font-mono">
-                  {formatCurrency(lifetimeSpendUSD, baseCurrency)} Total
-                </span>
-              </div>
+              {/* Live FX Rates Converter Button */}
+              <button
+                onClick={() => setShowForexModal(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-zinc-800 bg-zinc-900 hover:bg-zinc-800 text-xs font-mono font-semibold text-zinc-200 transition-colors cursor-pointer"
+                title="Open Live Currency Converter"
+              >
+                <ArrowRightLeft className="w-3.5 h-3.5 text-amber-400" />
+                <span className="text-amber-400 font-bold">{currentCurrency.code}</span>
+                <span className="text-zinc-400 hidden sm:inline">({currentCurrency.symbol})</span>
+              </button>
 
-              {/* Create New Journey Button */}
+              {/* Install PWA / App */}
+              <button
+                onClick={() => setShowApkModal(true)}
+                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs font-semibold text-zinc-200 transition-colors cursor-pointer"
+                title="Install app on your device"
+              >
+                <Smartphone className="w-3.5 h-3.5 text-zinc-400" />
+                <span className="text-[11px]">Install</span>
+              </button>
+
+              {/* Plan Trip CTA */}
               <button
                 onClick={() => {
                   setActiveTripId(null);
                   setActiveScreen('new-trip-wizard');
                 }}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#1A1A1A] hover:bg-black text-white text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.2em] shadow-xs active:scale-95 transition-all cursor-pointer"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 sm:py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-zinc-950 text-xs font-semibold tracking-wide btn-tactile cursor-pointer"
               >
-                <Plus className="w-3.5 h-3.5 text-white" />
+                <Plus className="w-4 h-4 stroke-[2.5]" />
                 <span>Plan Trip</span>
               </button>
 
-              {/* Google Account Profile Button with Drive Sync status */}
+              {/* Profile Button */}
               <button
                 onClick={() => setShowGoogleModal(true)}
-                className="flex items-center gap-1.5 p-1 rounded-full border border-[#E5E1DA] hover:border-[#1A1A1A] bg-white transition-colors cursor-pointer relative"
-                title={user.googleUser ? `Connected as ${user.name}` : 'Connect Google Account & Drive'}
+                className="flex items-center gap-1.5 p-1 rounded-xl border border-zinc-800 hover:border-zinc-700 bg-zinc-900 transition-all cursor-pointer relative"
+                title={user.googleUser ? `Connected as ${user.name}` : 'Account Settings'}
               >
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#E5E1DA] text-[10px] font-bold text-[#1A1A1A] overflow-hidden">
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-800 text-xs font-bold text-white overflow-hidden">
                   {user.avatar ? (
                     <img
                       src={user.avatar}
@@ -226,69 +220,82 @@ export const Navbar: React.FC = () => {
                       referrerPolicy="no-referrer"
                     />
                   ) : (
-                    'HY'
+                    <span>{user.name ? user.name.slice(0, 2).toUpperCase() : 'ME'}</span>
                   )}
                 </div>
 
                 {user.googleDriveConnected && (
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white absolute -top-0.5 -right-0.5" />
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 absolute -top-0.5 -right-0.5" />
                 )}
               </button>
 
             </div>
           </div>
 
-          {/* Mobile Navigation Bar */}
-          <div className="flex md:hidden overflow-x-auto py-2.5 gap-4 border-t border-[#E5E1DA] no-scrollbar text-[10px] font-bold uppercase tracking-widest text-[#8C8881]">
+          {/* Mobile Tab Bar */}
+          <div className="flex md:hidden overflow-x-auto py-2.5 gap-2 border-t border-zinc-800/80 no-scrollbar text-xs font-medium">
             <button
               onClick={() => {
                 setActiveTripId(null);
                 setActiveScreen('dashboard');
               }}
-              className={`whitespace-nowrap ${
-                activeScreen === 'dashboard' ? 'text-[#1A1A1A] font-extrabold border-b border-[#1A1A1A] pb-0.5' : 'hover:text-[#1A1A1A]'
+              className={`px-3 py-1 rounded-lg whitespace-nowrap transition-colors ${
+                activeScreen === 'dashboard'
+                  ? 'bg-zinc-800 text-white font-bold'
+                  : 'text-zinc-400 hover:text-white'
               }`}
             >
-              Dashboard
+              Trips
             </button>
             <button
               onClick={() => {
                 setActiveTripId(null);
                 setActiveScreen('visited-memory-hub');
               }}
-              className={`whitespace-nowrap ${
-                activeScreen === 'visited-memory-hub' ? 'text-[#1A1A1A] font-extrabold border-b border-[#1A1A1A] pb-0.5' : 'hover:text-[#1A1A1A]'
+              className={`px-3 py-1 rounded-lg whitespace-nowrap transition-colors flex items-center gap-1 ${
+                activeScreen === 'visited-memory-hub'
+                  ? 'bg-zinc-800 text-white font-bold'
+                  : 'text-zinc-400 hover:text-white'
               }`}
             >
-              Memory ({totalVisitedPlaces})
+              <span>Memory Vault</span>
+              {totalVisitedPlaces > 0 && (
+                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-400 font-mono">
+                  {totalVisitedPlaces}
+                </span>
+              )}
             </button>
             <button
               onClick={() => {
                 setActiveTripId(null);
                 setActiveScreen('cross-trip-analytics');
               }}
-              className={`whitespace-nowrap ${
-                activeScreen === 'cross-trip-analytics' ? 'text-[#1A1A1A] font-extrabold border-b border-[#1A1A1A] pb-0.5' : 'hover:text-[#1A1A1A]'
+              className={`px-3 py-1 rounded-lg whitespace-nowrap transition-colors ${
+                activeScreen === 'cross-trip-analytics'
+                  ? 'bg-zinc-800 text-white font-bold'
+                  : 'text-zinc-400 hover:text-white'
               }`}
             >
-              Global Spend
+              Analytics
             </button>
             <button
               onClick={() => {
                 setActiveTripId(null);
                 setActiveScreen('packing-templates');
               }}
-              className={`whitespace-nowrap ${
-                activeScreen === 'packing-templates' ? 'text-[#1A1A1A] font-extrabold border-b border-[#1A1A1A] pb-0.5' : 'hover:text-[#1A1A1A]'
+              className={`px-3 py-1 rounded-lg whitespace-nowrap transition-colors ${
+                activeScreen === 'packing-templates'
+                  ? 'bg-zinc-800 text-white font-bold'
+                  : 'text-zinc-400 hover:text-white'
               }`}
             >
-              Library
+              Packing
             </button>
             <button
-              onClick={() => setShowApkModal(true)}
-              className="whitespace-nowrap text-amber-800 font-bold"
+              onClick={() => setShowOfflineModal(true)}
+              className="px-3 py-1 rounded-lg whitespace-nowrap text-zinc-300 font-semibold bg-zinc-800 border border-zinc-700"
             >
-              📱 Roll out APK
+              Offline Vault
             </button>
           </div>
         </div>
@@ -297,6 +304,9 @@ export const Navbar: React.FC = () => {
       {/* Modals */}
       <GoogleAuthModal isOpen={showGoogleModal} onClose={() => setShowGoogleModal(false)} />
       <ApkInstallModal isOpen={showApkModal} onClose={() => setShowApkModal(false)} />
+      <OfflineManagerModal isOpen={showOfflineModal} onClose={() => setShowOfflineModal(false)} />
+      <LiveCurrencyConverterModal isOpen={showForexModal} onClose={() => setShowForexModal(false)} />
     </>
   );
 };
+
